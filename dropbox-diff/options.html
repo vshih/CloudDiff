@@ -1,0 +1,112 @@
+<html>
+<head><title>DropboxDiff Options</title>
+<style>
+body { background-color: #f0f0f0 }
+* { font-family: Tahoma, Helvetica, Arial }
+code, #examples li { font-family: Courier New }
+p { color: #505050; font-size: 11pt }
+h4 { font-weight: normal; margin-bottom: 0 }
+a { text-decoration: none }
+a:hover { text-decoration: underline }
+
+#flash { text-align: center }
+#saved { visibility: hidden; background-color: yellow; padding: 4px 8px 4px 12px; border-radius: 8px }
+#saved.show { visibility: visible }
+
+#margin { padding: 0 30px 0 10px; width: 252px }
+#content {
+	position: absolute;
+	left: 253px;
+	top: 20px;
+	padding-left: 25px;
+	border-left: 1px dotted gray;
+	height: 90%;
+}
+
+.clear { clear: both; padding: 10px }
+</style>
+<script type='text/javascript'>
+
+function populate_examples() {
+	var appVersion = navigator.appVersion;
+
+	var eg = [];
+
+	if (appVersion.indexOf('Mac') != -1) {
+		eg.push('opendiff');
+		eg.push('/usr/local/bin/mvim -d');
+	}
+	else if (appVersion.indexOf('Linux') != -1) {
+		eg.push('gvim -d');
+		eg.push('kdiff3');
+	}
+	else {
+		eg.push('"%ProgramFiles%\\TortoiseSVN\\bin\\TortoiseMerge.exe"');
+		eg.push('"%ProgramFiles%\\KDiff3\\kdiff3.exe"');
+	}
+
+	examples.innerHTML = '<li>' + eg.join('<li>');
+}
+
+function init() {
+	populate_examples();
+	restore_options();
+
+	// Set up change handler
+	var inputs = [
+		cmd
+	];
+
+	for (var i in inputs) { inputs[i].onchange = onchange }
+}
+
+// Read from localStorage
+function restore_options() {
+	cmd.value = localStorage.cmd || '';
+}
+
+function onchange() {
+	save_options();
+}
+
+function save_options() {
+	localStorage.cmd = cmd.value;
+
+	// Show feedback
+	saved.className = 'show';
+	setTimeout(function() { saved.className = '' }, 1200);
+}
+
+</script>
+</head>
+<body onload='init()'>
+<div id='flash'>
+	<span id='saved'>Saved.</span>
+</div>
+<div id='margin'>
+	<img src='128.png' /><br />
+	<h1>DropboxDiff</h1>
+	<a href='http://blog.vicshih.com'>blog.vicshih.com</a>
+</div>
+<div id='content'>
+	<h3>Diff Program</h3>
+	<p>
+		Specify the diff program used to compare different versions of files.
+	</p>
+	<p>
+		Use <code>$1</code> and <code>$2</code> to represent the left and right selected files.
+	</p>
+	<p>
+		Otherwise, the selected files will be passed as the first and second parameters to the specified program.
+	</p>
+	<p>
+		Specifying the full path to the program may be required.  Quote the path if it contains spaces.
+	</p>
+	<h4>Examples:</h4>
+	<ul id='examples'></ul>
+
+	<input type='text' id='cmd' size='100' />
+</div>
+</body>
+</html>
+

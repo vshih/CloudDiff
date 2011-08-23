@@ -1,0 +1,6 @@
+CMakeLists.txt
+PluginConfig.cmake
+Factory.cpp
+Mac/
+Win/
+X11/

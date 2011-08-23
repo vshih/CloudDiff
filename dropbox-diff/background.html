@@ -1,0 +1,159 @@
+<html>
+<body>
+<script src='jquery-1.6.2.min.js'></script>
+<script>
+
+// Globals
+
+// OS-dependent characters for command-line construction
+const	ESC_CHAR = navigator.appVersion.indexOf('Win') != -1 ? '^' : '\\';
+
+// URL-to-temporary-file-URI mapping
+var file_map = {};
+
+
+function init() {
+	//diff_plugin.debug = 1;
+
+	// Initialize file system interface
+	window.requestFileSystem = window.requestFileSystem || window.webkitRequestFileSystem;
+
+	// Set up request listener
+	chrome.extension.onRequest.addListener(function(request, sender, send_response) {
+		// Place to collect current file URIs being diffed
+		var files = {};
+
+		get_file_uri(request.left, function(uri) { files.left = uri; exec(files, send_response) });
+		get_file_uri(request.right, function(uri) { files.right = uri; exec(files, send_response) });
+	});
+
+	// Generate beacon file name
+	var beacon = 'beacon-' + parseInt(Math.random() * 10000000000) + '.txt';
+
+	// 1 = file size maximum one byte
+	window.requestFileSystem(window.TEMPORARY, 1,
+		function on_init_fs(fs) {
+			fs.root.getFile(beacon, {create: true}, function(fileEntry) {
+				fileEntry.createWriter(function(fileWriter) {
+
+					fileWriter.onwriteend = function() {
+						// Get extension id
+						var extension_id = new RegExp('^chrome-extension://(.+)/$').exec(chrome.extension.getURL(''))[1];
+
+						var response = diff_plugin.compute_path(extension_id, beacon);
+
+						response ? alert(response) : console.log('beacon found');
+					};
+
+					fileWriter.onerror = function(e) {
+						alert('Failed to create beacon "' + beacon + '"');
+					};
+
+					var bb = new window.WebKitBlobBuilder();
+					fileWriter.write(bb.getBlob('text/plain'));
+				},
+				fs_err);
+			},
+			fs_err);
+		},
+		fs_err
+	);
+
+	console.log('init done');
+}
+
+function fs_err(e) {
+	switch (e.code) {
+		case FileError.QUOTA_EXCEEDED_ERR:				return alert('QUOTA_EXCEEDED_ERR');
+		case FileError.NOT_FOUND_ERR:							return alert('NOT_FOUND_ERR');
+		case FileError.SECURITY_ERR:							return alert('SECURITY_ERR');
+		case FileError.INVALID_MODIFICATION_ERR:	return alert('INVALID_MODIFICATION_ERR');
+		case FileError.INVALID_STATE_ERR:					return alert('INVALID_STATE_ERR');
+		default:																	return alert('unknown error');
+	};
+}
+
+function sanitize_date(d) {
+	return d.replace(/[\/:]/g, '.').replace(/ ([AP]M)/, '$1').replace(/^\s+|\s+$/g, '').replace(/\s+\(.+\)/, '').toLowerCase();
+}
+
+// Fetch the given URL content and save to a temporary file,
+// passing the file URI (file://) to the callback as a response.
+// Or, return previously cached result
+function get_file_uri(info, callback) {
+	var uri = file_map[info.url];
+
+	if (uri) { return callback(uri) }
+
+	// Extract filename and revision ("sjid" parameter)
+	var r = /\/([^\/]+)(\.[^\/.?]+)?\?w=[^&]+&sjid=(\d+)$/.exec(info.url);
+
+	var base	= decodeURIComponent(r[1]);
+	var ext		= decodeURIComponent(typeof r[2] == 'undefined' ? '' : r[2]);
+	var rev		= r[3];
+
+	// Append revision to ensure uniqueness
+	// Keep extension, in case diff tool can use it
+	var name = sanitize_date(info.changed) + ' ' + base + ' ' + rev + ext;
+
+	$.get(info.url, function(data) {
+		// Allocate temporary file
+		window.requestFileSystem(window.TEMPORARY, info.size,
+			function on_init_fs(fs) {
+				fs.root.getFile(name, {create: true}, function(fileEntry) {
+					fileEntry.createWriter(function(fileWriter) {
+
+						fileWriter.onwriteend = function() { callback(fileEntry.name) };
+
+						fileWriter.onerror = function(e) {
+							alert('Local write failed for:\n\n' + info.url + '\n\n' + e.toString());
+						};
+
+						var bb = new window.WebKitBlobBuilder();
+						bb.append(data);
+						fileWriter.write(bb.getBlob('text/plain'));
+					},
+					fs_err);
+				},
+				fs_err);
+			},
+			fs_err
+		);
+	}, 'text')
+	.error(function() { alert('Fetch failed for:\n\n' + info.url) });
+}
+
+// Callback to spawn the actual diff process
+function exec(files, send_response) {
+	var cmd = localStorage.cmd;
+
+	if (!cmd) { return send_response('DropboxDiff is not configured.  See Tools | Extensions to specify a diff tool.') }
+
+	if (!files.left || !files.right) { return }
+
+	// Got both, kick it off!
+	var left = quote(files.left);
+	var right = quote(files.right);
+
+	if (cmd.indexOf('$1') != -1 && cmd.indexOf('$2') != -1) {
+		// Do substitution
+		cmd = cmd.replace('$1', left).replace('$2', right);
+	}
+	else {
+		// Append
+		cmd += ' ' + left + ' ' + right;
+	}
+
+	return send_response(diff_plugin.exec(cmd));
+}
+
+function quote(s) {
+	return '"' + s.replace(ESC_CHAR, ESC_CHAR + ESC_CHAR).replace('"', ESC_CHAR + '"') + '"';
+}
+
+</script>
+<object id='diff_plugin' type='application/x-dropbox-diff-plugin'>
+	<param name='onload' value='init' />
+</object>
+</body>
+</html>

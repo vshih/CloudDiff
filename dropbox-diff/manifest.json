@@ -1,0 +1,31 @@
+{
+	"name": "DropboxDiff",
+	"version": "1.0.0",
+
+	"background_page": "background.html",
+	"content_scripts": [
+		{
+			"js": [
+				"jquery-1.6.2.min.js",
+				"content.js"
+			],
+			"matches": [ "https://www.dropbox.com/revisions/*" ],
+			"run_at": "document_end"
+		}
+	],
+	"icons": {
+		"128": "128.png",
+		"16": "16.png",
+		"48": "48.png"
+	},
+	"options_page": "options.html",
+	"permissions": [
+		"https://dl-web.dropbox.com/*",
+		"unlimitedStorage"
+	],
+	"plugins": [
+		{ "path": "npDropboxDiffPlugin.dll" },
+		{ "path": "DropboxDiffPlugin.plugin" },
+		{ "path": "npDropboxDiffPlugin.so" }
+	]
+}
