@@ -63,6 +63,14 @@ NPAPI implementation plugin
 - Dialog to confirm, the first time
 - Store current cmd line securely
 
+
+Building
+========
+xcodebuild -configuration MinSizeRel
+
+leveldb - change CC line to: CC = g++ -arch x86_64 for optimized builds on mac
+lipo libleveldb-* -create -output libleveldb.a
+
 References:
 - http://www.firebreath.org/display/documentation/FireBreath+Home
 - http://www.softagalleria.net/dirent.php

@@ -5,15 +5,15 @@
 
 // Globals
 
-// OS-dependent characters for command-line construction
-const	ESC_CHAR = navigator.appVersion.indexOf('Win') != -1 ? '^' : '\\';
-
 // URL-to-temporary-file-URI mapping
 var file_map = {};
 
 
 function init() {
-	//diff_plugin.debug = 1;
+	diff_plugin.debug = 1;
+
+	// Set extension_id
+	diff_plugin.extension_id = new RegExp('^chrome-extension://(.+)/$').exec(chrome.extension.getURL(''))[1];
 
 	// Initialize file system interface
 	window.requestFileSystem = window.requestFileSystem || window.webkitRequestFileSystem;
@@ -23,54 +23,23 @@ function init() {
 		// Place to collect current file URIs being diffed
 		var files = {};
 
-		get_file_uri(request.left, function(uri) { files.left = uri; exec(files, send_response) });
-		get_file_uri(request.right, function(uri) { files.right = uri; exec(files, send_response) });
+		get_file_uri(request.left, function(uri) { files.left = uri; diff(files, send_response) });
+		get_file_uri(request.right, function(uri) { files.right = uri; diff(files, send_response) });
 	});
-
-	// Generate beacon file name
-	var beacon = 'beacon-' + parseInt(Math.random() * 10000000000) + '.txt';
-
-	// 1 = file size maximum one byte
-	window.requestFileSystem(window.TEMPORARY, 1,
-		function on_init_fs(fs) {
-			fs.root.getFile(beacon, {create: true}, function(fileEntry) {
-				fileEntry.createWriter(function(fileWriter) {
-
-					fileWriter.onwriteend = function() {
-						// Get extension id
-						var extension_id = new RegExp('^chrome-extension://(.+)/$').exec(chrome.extension.getURL(''))[1];
-
-						var response = diff_plugin.compute_path(extension_id, beacon);
-
-						response ? alert(response) : console.log('beacon found');
-					};
-
-					fileWriter.onerror = function(e) {
-						alert('Failed to create beacon "' + beacon + '"');
-					};
-
-					var bb = new window.WebKitBlobBuilder();
-					fileWriter.write(bb.getBlob('text/plain'));
-				},
-				fs_err);
-			},
-			fs_err);
-		},
-		fs_err
-	);
-
-	console.log('init done');
 }
 
 function fs_err(e) {
+	var r = 'unknown error';
+
 	switch (e.code) {
-		case FileError.QUOTA_EXCEEDED_ERR:				return alert('QUOTA_EXCEEDED_ERR');
-		case FileError.NOT_FOUND_ERR:							return alert('NOT_FOUND_ERR');
-		case FileError.SECURITY_ERR:							return alert('SECURITY_ERR');
-		case FileError.INVALID_MODIFICATION_ERR:	return alert('INVALID_MODIFICATION_ERR');
-		case FileError.INVALID_STATE_ERR:					return alert('INVALID_STATE_ERR');
-		default:																	return alert('unknown error');
+		case FileError.QUOTA_EXCEEDED_ERR:				r = 'QUOTA_EXCEEDED_ERR';
+		case FileError.NOT_FOUND_ERR:							r = 'NOT_FOUND_ERR';
+		case FileError.SECURITY_ERR:							r = 'SECURITY_ERR';
+		case FileError.INVALID_MODIFICATION_ERR:	r = 'INVALID_MODIFICATION_ERR';
+		case FileError.INVALID_STATE_ERR:					r = 'INVALID_STATE_ERR';
 	};
+
+	alert(r);
 }
 
 function sanitize_date(d) {
@@ -124,7 +93,7 @@ function get_file_uri(info, callback) {
 }
 
 // Callback to spawn the actual diff process
-function exec(files, send_response) {
+function diff(files, send_response) {
 	var cmd = localStorage.cmd;
 
 	if (!cmd) { return send_response('DropboxDiff is not configured.  See Tools | Extensions to specify a diff tool.') }
@@ -132,23 +101,7 @@ function exec(files, send_response) {
 	if (!files.left || !files.right) { return }
 
 	// Got both, kick it off!
-	var left = quote(files.left);
-	var right = quote(files.right);
-
-	if (cmd.indexOf('$1') != -1 && cmd.indexOf('$2') != -1) {
-		// Do substitution
-		cmd = cmd.replace('$1', left).replace('$2', right);
-	}
-	else {
-		// Append
-		cmd += ' ' + left + ' ' + right;
-	}
-
-	return send_response(diff_plugin.exec(cmd));
-}
-
-function quote(s) {
-	return '"' + s.replace(ESC_CHAR, ESC_CHAR + ESC_CHAR).replace('"', ESC_CHAR + '"') + '"';
+	return send_response(diff_plugin.diff(cmd, files.left, files.right));
 }
 
 </script>

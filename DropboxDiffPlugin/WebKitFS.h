@@ -1,7 +1,9 @@
 
 #pragma once
 
+#include "leveldb/db.h"
 #include <string>
+#include <vector>
 
 /**
  *
@@ -11,8 +13,22 @@
  *
  */
 
-namespace WebKitFS
+class Logger;
+
+class WebKitFS
 {
-	std::string get_root(const std::string& extension_id);
-}
+public:
+	WebKitFS(Logger* logger);
+
+	int set_extension_id(const std::string& extension_id);
+
+	std::string get_actual_root() const;
+
+	std::vector<std::string> get_actual_file_path(const std::vector<std::string>& files) const;
+
+private:
+	leveldb::Options	m_options;
+	Logger*				m_logger;
+	std::string			m_db_path;
+};
 
