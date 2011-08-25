@@ -20,7 +20,8 @@
 	},
 	"options_page": "options.html",
 	"permissions": [
-		"https://dl-web.dropbox.com/*",
+		"cookies",
+		"https://*.dropbox.com/*",
 		"unlimitedStorage"
 	],
 	"plugins": [

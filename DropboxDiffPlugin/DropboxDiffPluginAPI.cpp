@@ -10,10 +10,24 @@
 
 #include "DropboxDiffPluginAPI.h"
 
+#include <curl/curl.h>
+#include <sys/stat.h>
+
 
 using namespace std;
 
-static void replace_in_place(string& target, const string& s, const string& r);
+static CURLcode	get_file(const string& cookie, const string& url, const string& name);
+static string	tmp_dir();
+static void		replace_in_place(string& target, const string& s, const string& r);
+static string	quote(const string& s);
+
+
+// Command-line quoting
+#if defined(_WIN32)
+#	define ESC_CHAR "^"
+#else
+#	define ESC_CHAR "\\"
+#endif
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -29,8 +43,7 @@ static void replace_in_place(string& target, const string& s, const string& r);
 DropboxDiffPluginAPI::DropboxDiffPluginAPI(const DropboxDiffPluginPtr& plugin, const FB::BrowserHostPtr& host) :
 	m_plugin(plugin),
 	m_host(host),
-	m_debug(false),
-	m_webkit_fs(this)
+	m_debug(false)
 {
 	// Properties
 	registerProperty("debug",
@@ -41,11 +54,6 @@ DropboxDiffPluginAPI::DropboxDiffPluginAPI(const DropboxDiffPluginPtr& plugin, c
 	registerProperty("version",
 					 make_property(this,
 						&DropboxDiffPluginAPI::get_version));
-
-	registerProperty("extension_id",
-					 make_property(this,
-						&DropboxDiffPluginAPI::get_extension_id,
-						&DropboxDiffPluginAPI::set_extension_id));
 
 	// Methods
 	registerMethod("diff", make_method(this, &DropboxDiffPluginAPI::diff));
@@ -95,45 +103,37 @@ std::string DropboxDiffPluginAPI::get_version() const
 }
 
 //
-// get_extension_id
-//
-std::string DropboxDiffPluginAPI::get_extension_id() const
-{
-	return m_extension_id;
-}
-
-//
-// set_extension_id
-//
-void DropboxDiffPluginAPI::set_extension_id(const string& extension_id)
-{
-	m_extension_id = extension_id;
-
-	int result = m_webkit_fs.set_extension_id(extension_id);
-
-	if (result != 0) {
-		char msg[1024];
-		sprintf(msg, "Error setting extension_id: %d", result);
-		m_host->htmlLog(msg);
-	}
-}
-
-//
 // diff
 //
 // Returns result of system() call (0 on success).
 //
-long DropboxDiffPluginAPI::diff(const string& cmd, const string& left, const string& right) const
+long DropboxDiffPluginAPI::diff(
+	const string& cookie,
+	const string& cmd,
+	const string& left_url,
+	const string& left_name,
+	const string& right_url,
+	const string& right_name
+) const
 {
-	vector<string> files;
-	files.push_back(left);
-	files.push_back(right);
+	// Create temporary directory, if it doesn't already exist
+	string dir = tmp_dir() + "dropbox-diff/";
 
-	vector<string> actual_files = m_webkit_fs.get_actual_file_path(files);
+	struct stat s;
+
+	if (stat(dir.c_str(), &s) != 0) {
+		mkdir(dir.c_str(), 0777);
+	}
+
+	// Download files
+	CURLcode result;
+
+	if ((result = get_file(cookie, left_url, dir + left_name)) != CURLE_OK) return (int)result;
+	if ((result = get_file(cookie, right_url, dir + right_name)) != CURLE_OK) return (int)result;
 
 	// Change directory to sandbox
 	string cmd_cd = "cd \"";
-	cmd_cd += m_webkit_fs.get_actual_root();
+	cmd_cd += dir;
 	cmd_cd += "\" && ";
 
 #if defined(_WIN32)
@@ -143,22 +143,24 @@ long DropboxDiffPluginAPI::diff(const string& cmd, const string& left, const str
 
 	cmd_cd += cmd;
 
+	string q_left = quote(left_name);
+	string q_right = quote(right_name);
+
 	if (cmd.find("$1") != string::npos) {
 		// Do file name substitutions
-		replace_in_place(cmd_cd, "$1", actual_files[0]);
-		replace_in_place(cmd_cd, "$2", actual_files[1]);
+		replace_in_place(cmd_cd, "$1", q_left);
+		replace_in_place(cmd_cd, "$2", q_right);
 	}
 	else {
 		// Append file names
-		cmd_cd += " \"";
-		cmd_cd += actual_files[0];
-		cmd_cd += "\" \"";
-		cmd_cd += actual_files[1];
-		cmd_cd += '"';
+		cmd_cd += ' ';
+		cmd_cd += q_left;
+		cmd_cd += ' ';
+		cmd_cd += q_right;
 	}
 
-#if defined(__linux__)
-	// For linux, spawn process in the background
+#if !defined(_WIN32)
+	// For non-Windows, spawn process in the background
 	cmd_cd += " &";
 #endif
 
@@ -169,6 +171,69 @@ long DropboxDiffPluginAPI::diff(const string& cmd, const string& left, const str
 
 // ===== Utility functions
 
+static string tmp_dir()
+{
+	return string(getenv(
+#if defined(_WIN32)
+		"TMP"
+#else
+		"TMPDIR"
+#endif
+	));
+}
+
+static CURLcode get_file(const string& cookie, const string& url, const string& name)
+{
+	// Skip if file exists already
+	struct stat s;
+
+	if (stat(name.c_str(), &s) == 0) return CURLE_OK;
+
+	// Download it
+	CURL* curl = curl_easy_init();
+
+	if (!curl) return CURLE_FAILED_INIT;
+
+	curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+
+	// TODO Verify server's certificate
+	curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
+
+	// TODO Verify hostname
+	curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
+
+	curl_easy_setopt(curl, CURLOPT_COOKIE, cookie.c_str());
+
+	FILE* f = fopen(name.c_str(), "w");
+
+	curl_easy_setopt(curl, CURLOPT_WRITEDATA, f);
+
+	CURLcode res = curl_easy_perform(curl);
+
+	// Cleanup
+	curl_easy_cleanup(curl);
+
+	fclose(f);
+
+	return res;
+}
+
+
+static string quote(const string& s)
+{
+	string result = s;
+
+	// Escape any escape char instances
+	replace_in_place(result, ESC_CHAR, ESC_CHAR ESC_CHAR);
+
+	// Escape any embedded quotes (should be none)
+	replace_in_place(result, "\"", ESC_CHAR "\"");
+
+	// Perform actual quoting
+	return string("\"") + result + "\"";
+}
+
+
 static void replace_in_place(string& target, const string& s, const string& r)
 {
 	for (string::size_type pos = 0; ((pos = target.find(s, pos)) != string::npos); pos += r.size())
@@ -176,6 +241,7 @@ static void replace_in_place(string& target, const string& s, const string& r)
 		target.replace(pos, s.size(), r);
 	}
 }
+
 
 void DropboxDiffPluginAPI::trace(const string& s) const
 {

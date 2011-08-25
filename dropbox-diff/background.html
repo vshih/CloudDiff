@@ -2,108 +2,57 @@
 <body>
 <script src='jquery-1.6.2.min.js'></script>
 <script>
-
-// Globals
-
-// URL-to-temporary-file-URI mapping
-var file_map = {};
-
-
 function init() {
 	diff_plugin.debug = 1;
 
-	// Set extension_id
-	diff_plugin.extension_id = new RegExp('^chrome-extension://(.+)/$').exec(chrome.extension.getURL(''))[1];
-
-	// Initialize file system interface
-	window.requestFileSystem = window.requestFileSystem || window.webkitRequestFileSystem;
-
 	// Set up request listener
 	chrome.extension.onRequest.addListener(function(request, sender, send_response) {
-		// Place to collect current file URIs being diffed
-		var files = {};
+		var cmd = localStorage.cmd;
 
-		get_file_uri(request.left, function(uri) { files.left = uri; diff(files, send_response) });
-		get_file_uri(request.right, function(uri) { files.right = uri; diff(files, send_response) });
+		if (!cmd) { return send_response('DropboxDiff is not configured.  See Tools | Extensions to specify a diff tool.') }
+
+		if (!request.left || !request.right) { return }
+
+
+		chrome.cookies.getAll({domain: '.dropbox.com', name: 'touch'}, function(cookies) {
+			var cookie = '';
+
+			$.each(cookies, function(i, c) { cookie += c.name + '=' + c.value + '; ' });
+
+			send_response(
+				diff_plugin.diff(
+					cookie,
+					cmd,
+					request.left.url,
+					get_file_name(request.left),
+					request.right.url,
+					get_file_name(request.right)
+				)
+			);
+		});
 	});
-}
-
-function fs_err(e) {
-	var r = 'unknown error';
-
-	switch (e.code) {
-		case FileError.QUOTA_EXCEEDED_ERR:				r = 'QUOTA_EXCEEDED_ERR';
-		case FileError.NOT_FOUND_ERR:							r = 'NOT_FOUND_ERR';
-		case FileError.SECURITY_ERR:							r = 'SECURITY_ERR';
-		case FileError.INVALID_MODIFICATION_ERR:	r = 'INVALID_MODIFICATION_ERR';
-		case FileError.INVALID_STATE_ERR:					r = 'INVALID_STATE_ERR';
-	};
-
-	alert(r);
 }
 
 function sanitize_date(d) {
 	return d.replace(/[\/:]/g, '.').replace(/ ([AP]M)/, '$1').replace(/^\s+|\s+$/g, '').replace(/\s+\(.+\)/, '').toLowerCase();
 }
 
-// Fetch the given URL content and save to a temporary file,
-// passing the file URI (file://) to the callback as a response.
-// Or, return previously cached result
-function get_file_uri(info, callback) {
-	var uri = file_map[info.url];
-
-	if (uri) { return callback(uri) }
-
+function get_file_name(info) {
 	// Extract filename and revision ("sjid" parameter)
-	var r = /\/([^\/]+)(\.[^\/.?]+)?\?w=[^&]+&sjid=(\d+)$/.exec(info.url);
+	var rev = info.url.substr(info.url.lastIndexOf('=') + 1);
 
-	var base	= decodeURIComponent(r[1]);
-	var ext		= decodeURIComponent(typeof r[2] == 'undefined' ? '' : r[2]);
-	var rev		= r[3];
+	var basename = info.url;
+	basename = basename.substr(basename.lastIndexOf('/') + 1);
+	basename = decodeURIComponent(basename.substr(0, basename.indexOf('?')));
+
+	var dot = basename.lastIndexOf('.');
+	var ext = dot == -1 ? '' : basename.substr(dot);
+	var base = basename.substr(0, basename.length - ext.length);
 
 	// Append revision to ensure uniqueness
 	// Keep extension, in case diff tool can use it
-	var name = sanitize_date(info.changed) + ' ' + base + ' ' + rev + ext;
-
-	$.get(info.url, function(data) {
-		// Allocate temporary file
-		window.requestFileSystem(window.TEMPORARY, info.size,
-			function on_init_fs(fs) {
-				fs.root.getFile(name, {create: true}, function(fileEntry) {
-					fileEntry.createWriter(function(fileWriter) {
-
-						fileWriter.onwriteend = function() { callback(fileEntry.name) };
-
-						fileWriter.onerror = function(e) {
-							alert('Local write failed for:\n\n' + info.url + '\n\n' + e.toString());
-						};
-
-						var bb = new window.WebKitBlobBuilder();
-						bb.append(data);
-						fileWriter.write(bb.getBlob('text/plain'));
-					},
-					fs_err);
-				},
-				fs_err);
-			},
-			fs_err
-		);
-	}, 'text')
-	.error(function() { alert('Fetch failed for:\n\n' + info.url) });
+	return sanitize_date(info.changed) + ' ' + base + ' ' + rev + ext;
 }
-
-// Callback to spawn the actual diff process
-function diff(files, send_response) {
-	var cmd = localStorage.cmd;
-
-	if (!cmd) { return send_response('DropboxDiff is not configured.  See Tools | Extensions to specify a diff tool.') }
-
-	if (!files.left || !files.right) { return }
-
-	// Got both, kick it off!
-	return send_response(diff_plugin.diff(cmd, files.left, files.right));
-}
-
 </script>
 <object id='diff_plugin' type='application/x-dropbox-diff-plugin'>
 	<param name='onload' value='init' />

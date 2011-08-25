@@ -5,13 +5,11 @@
 \**********************************************************/
 
 #include <string>
-#include <sstream>
 #include <boost/weak_ptr.hpp>
 #include "JSAPIAuto.h"
 #include "BrowserHost.h"
 #include "DropboxDiffPlugin.h"
 #include "Logger.h"
-#include "WebKitFS.h"
 
 #ifndef H_DropboxDiffPluginAPI
 #define H_DropboxDiffPluginAPI
@@ -28,22 +26,25 @@ public:
 	std::string get_version() const;
 	bool get_debug() const;
 	void set_debug(bool val);
-	std::string get_extension_id() const;
-	void set_extension_id(const std::string& extension_id);
 
 	// Methods
-	long diff(const std::string& cmd, const std::string& left, const std::string& right) const;
+	long diff(
+		const std::string& cookie,
+		const std::string& cmd,
+		const std::string& left_url,
+		const std::string& left_name,
+		const std::string& right_url,
+		const std::string& right_name
+	) const;
 
 	// Logger implementation
 	virtual void trace(const std::string& s) const;
 
 private:
-	DropboxDiffPluginWeakPtr m_plugin;
-	mutable FB::BrowserHostPtr m_host;
+	DropboxDiffPluginWeakPtr	m_plugin;
+	mutable FB::BrowserHostPtr	m_host;
 
-	bool		m_debug;
-	WebKitFS	m_webkit_fs;
-	std::string	m_extension_id;
+	bool						m_debug;
 };
 
 #endif // H_DropboxDiffPluginAPI

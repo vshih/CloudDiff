@@ -13,23 +13,6 @@ var C = {};
 // ===== Functions
 
 
-function size_to_bytes(s) {
-	var r = /(\d+)( bytes|[KMGT]B)/.exec(s);
-
-	if (!r.length) { return null }
-
-	var bytes = r[1];
-
-	switch (r[2]) {
-		case 'KB': bytes *= 1024;									break;
-		case 'MB': bytes *= 1024*1024;						break;
-		case 'GB': bytes *= 1024*1024*1024;				break;
-		case 'TB': bytes *= 1024*1024*1024*1024;	break;
-	}
-
-	return bytes;
-}
-
 function get_file_info(which) {
 	var radio = table.find('input[name=diff_' + which + ']').filter(':checked');
 
@@ -38,9 +21,8 @@ function get_file_info(which) {
 	var row = radio.closest('tr');
 
 	return {
-		changed:	row.find('td:nth-child(' + (C.CHANGED + 1) + ')').text(),
 		url:			row.find('td:nth-child(' + (C.PREVIEW + 1) + ') > a').attr('href'),
-		size:			size_to_bytes(row.find('td:nth-child(' + (C.SIZE + 1) + ')').text())
+		changed:	row.find('td:nth-child(' + (C.CHANGED + 1) + ')').text()
 	};
 }
 
@@ -96,7 +78,6 @@ function diff_onclick() {
 	preview.after('<th>Diff</th>');
 
 	C.DIFF = C.PREVIEW + 1;
-	C.SIZE = header.find('> th:contains(Size)')[0].cellIndex + 1;
 
 	// Insert Diff column for each row
 	tbody.find('> tr > td:nth-child(' + (C.PREVIEW + 1) + ')').after(
