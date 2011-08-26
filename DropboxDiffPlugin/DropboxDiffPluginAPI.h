@@ -30,27 +30,25 @@ public:
 
 	// Methods
 	long diff(
-		const std::string& cookie,
 		const std::string& cmd,
-		const std::string& left_url,
 		const std::string& left_name,
-		const std::string& right_url,
-		const std::string& right_name
+		const std::string& left_text,
+		const std::string& right_name,
+		const std::string& right_text
 	);
 
 	// Logger implementation
 	virtual void trace(const std::string& s) const;
 
 protected:
-	long get_file(const std::string& cookie, const std::string& url, const std::string& name);
-
-    void get_url_callback(const FB::JSObjectPtr& callback, bool success, const FB::HeaderMap& headers,
-        const boost::shared_array<uint8_t>& data, const size_t size);
+	void write_file(const std::string& name, const std::string& text);
 
 private:
 	DropboxDiffPluginWeakPtr	m_plugin;
 	mutable FB::BrowserHostPtr	m_host;
 
+	std::string					m_tmp_dir;
+	std::set<std::string>		m_files;
 	bool						m_debug;
 };
 

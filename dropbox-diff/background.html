@@ -13,36 +13,45 @@ function init() {
 
 		if (!request.left || !request.right) { return }
 
+		// Place to collect file contents
+		var data = {
+			left: {
+				name: compute_file_name(request.left.url, request.left.changed)
+			},
+			right: {
+				name: compute_file_name(request.right.url, request.right.changed)
+			}
+		};
 
-		chrome.cookies.getAll({domain: '.dropbox.com', name: 'touch'}, function(cookies) {
-			var cookie = '';
-
-			$.each(cookies, function(i, c) { cookie += c.name + '=' + c.value + '; ' });
-
-			send_response(
-				diff_plugin.diff(
-					cookie,
-					cmd,
-					request.left.url,
-					get_file_name(request.left),
-					request.right.url,
-					get_file_name(request.right)
-				)
-			);
-		});
+		$.get(request.left.url, function(text) { data.left.text = text; recv(data, send_response) });
+		$.get(request.right.url, function(text) { data.right.text = text; recv(data, send_response) });
 	});
+}
+
+function recv(data, send_response) {
+	if (!('text' in data.left && 'text' in data.right)) { return }
+
+	// Got both, kick it off!
+	send_response(
+		diff_plugin.diff(
+			localStorage.cmd,
+			data.left.name,
+			data.left.text,
+			data.right.name,
+			data.right.text
+		)
+	);
 }
 
 function sanitize_date(d) {
 	return d.replace(/[\/:]/g, '.').replace(/ ([AP]M)/, '$1').replace(/^\s+|\s+$/g, '').replace(/\s+\(.+\)/, '').toLowerCase();
 }
 
-function get_file_name(info) {
+function compute_file_name(url, changed) {
 	// Extract filename and revision ("sjid" parameter)
-	var rev = info.url.substr(info.url.lastIndexOf('=') + 1);
+	var rev = url.substr(url.lastIndexOf('=') + 1);
 
-	var basename = info.url;
-	basename = basename.substr(basename.lastIndexOf('/') + 1);
+	var basename = url.substr(url.lastIndexOf('/') + 1);
 	basename = decodeURIComponent(basename.substr(0, basename.indexOf('?')));
 
 	var dot = basename.lastIndexOf('.');
@@ -51,7 +60,7 @@ function get_file_name(info) {
 
 	// Append revision to ensure uniqueness
 	// Keep extension, in case diff tool can use it
-	return sanitize_date(info.changed) + ' ' + base + ' ' + rev + ext;
+	return sanitize_date(changed) + ' ' + base + ' ' + rev + ext;
 }
 </script>
 <object id='diff_plugin' type='application/x-dropbox-diff-plugin'>
