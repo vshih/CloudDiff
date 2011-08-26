@@ -1,12 +1,10 @@
 
 TODO:
-	- Source control
-
 	- Extension
 		+ Options page
 			- File extension-specific command configuration
 		- Progress bars
-		- Screenshots
+		+ Screenshots
 
 		+ Icons
 		+ Minimum browser version
@@ -25,6 +23,8 @@ TODO:
 		+ Compute extension ID using chrome.extension.getURL()
 		+ Debug mode
 		+ Delete beacon file
+
+	+ Source control
 
 Info
 ====
