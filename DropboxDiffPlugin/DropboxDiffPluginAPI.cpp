@@ -11,38 +11,27 @@
 
 #include "DropboxDiffPluginAPI.h"
 
-#if defined(CURL_IMPLEMENTATION)
-#	include <curl/curl.h>
-#endif
-
-#if defined (_WIN32)
-#	include <Windows.h>
-#endif
-
-#include "NpapiTypes.h"
-//#include <npapi.h>
-
 #if defined (_WIN32)
 #	include <direct.h>
 #	define mkdir(dirname, mode) _mkdir(dirname)
 #endif
 
-#include <sys/stat.h>
+#include <sys/stat.h> // for stat
+#include <fstream>
 
 
 using namespace std;
 
-static string	tmp_dir();
 static void		replace_in_place(string& target, const string& s, const string& r);
 static string	quote(const string& s);
 
-
-// Command-line quoting
-#if defined(_WIN32)
-#	define ESC_CHAR "^"
-#else
-#	define ESC_CHAR "\\"
-#endif
+struct rm : public unary_function<string, void>
+{
+	void operator()(const string& file)
+	{
+		remove(file.c_str());
+	}
+};
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -58,6 +47,14 @@ static string	quote(const string& s);
 DropboxDiffPluginAPI::DropboxDiffPluginAPI(const DropboxDiffPluginPtr& plugin, const FB::BrowserHostPtr& host) :
 	m_plugin(plugin),
 	m_host(host),
+	m_tmp_dir(
+#if defined(_WIN32)
+		string(getenv("TMP")) + "\\"
+#else
+		string(getenv("TMPDIR"))
+#endif
+		+ "dropbox-diff/"
+	),
 	m_debug(false)
 {
 	// Properties
@@ -86,6 +83,8 @@ DropboxDiffPluginAPI::DropboxDiffPluginAPI(const DropboxDiffPluginPtr& plugin, c
 ///////////////////////////////////////////////////////////////////////////////
 DropboxDiffPluginAPI::~DropboxDiffPluginAPI()
 {
+	// Remove all recorded files
+	std::for_each(m_files.begin(), m_files.end(), rm());
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -123,32 +122,24 @@ std::string DropboxDiffPluginAPI::get_version() const
 // Returns result of system() call (0 on success).
 //
 long DropboxDiffPluginAPI::diff(
-	const string& cookie,
 	const string& cmd,
-	const string& left_url,
 	const string& left_name,
-	const string& right_url,
-	const string& right_name
+	const string& left_text,
+	const string& right_name,
+	const string& right_text
 )
 {
-	// Create temporary directory, if it doesn't already exist
-	string dir = tmp_dir() + "dropbox-diff/";
-
+	// Create temporary directory if it doesn't already exist
 	struct stat s;
+	if (stat(m_tmp_dir.c_str(), &s) != 0) mkdir(m_tmp_dir.c_str(), 0777);
 
-	if (stat(dir.c_str(), &s) != 0) {
-		mkdir(dir.c_str(), 0777);
-	}
+	// Write temporary files
+	write_file(m_tmp_dir + left_name, left_text);
+	write_file(m_tmp_dir + right_name, right_text);
 
-	// Download files
-	long result;
-
-	if ((result = get_file(cookie, left_url, dir + left_name)) != 0) return result;
-	if ((result = get_file(cookie, right_url, dir + right_name)) != 0) return result;
-
-	// Change directory to sandbox
+	// Change to the temp directory
 	string cmd_cd = "cd \"";
-	cmd_cd += dir;
+	cmd_cd += m_tmp_dir;
 	cmd_cd += "\" && ";
 
 #if defined(_WIN32)
@@ -184,86 +175,32 @@ long DropboxDiffPluginAPI::diff(
 	return system(cmd_cd.c_str());
 }
 
+
 // ===== Utility functions
 
-static string tmp_dir()
-{
-	return
-#if defined(_WIN32)
-		string(getenv("TMP")) + "\\"
-#else
-		string(getenv("TMPDIR"))
-#endif
-	;
-}
 
-long DropboxDiffPluginAPI::get_file(const string& cookie, const string& url, const string& name)
+void DropboxDiffPluginAPI::write_file(const string& name, const string& text)
 {
 	// Skip if file exists already
 	struct stat s;
+	if (stat(name.c_str(), &s) == 0) return;
 
-	if (stat(name.c_str(), &s) == 0) return 0;
+	m_files.insert(name);
 
-	// Download it
+	// Write it
+	ofstream f;
+	f.open(name.c_str(), ios::out | ios::app | ios::binary);
+	f << text;
+	f.close();
+}
 
-#if defined(CURL_IMPLEMENTATION)
 
-	CURL* curl = curl_easy_init();
-
-	if (!curl) return CURLE_FAILED_INIT;
-
-	curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
-
-	// TODO Verify server's certificate
-	curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
-
-	// TODO Verify hostname
-	curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
-
-	curl_easy_setopt(curl, CURLOPT_COOKIE, cookie.c_str());
-
-	FILE* f = fopen(name.c_str(), "w");
-
-	curl_easy_setopt(curl, CURLOPT_WRITEDATA, f);
-
-	CURLcode res = curl_easy_perform(curl);
-
-	// Cleanup
-	curl_easy_cleanup(curl);
-
-	fclose(f);
-
-	return res;
-
+// Command-line quoting
+#if defined(_WIN32)
+#	define ESC_CHAR "^"
 #else
-
-	/*m_host->Evaluate(NULL, NPObject *npobj, NPString *script,
-                  NPVariant *result);*/
-
-	//const FB::JSObjectPtr callback(new FB::Npapi::NPObjectAPI(NULL, m_host.get()));
-	//const FB::JSObjectPtr callback(FB::FBNull);
-
-	FB::SimpleStreamHelper::AsyncGet(
-		m_host,
-		FB::URI::fromString("https://encrypted.google.com/"),
-        boost::bind(&DropboxDiffPluginAPI::get_url_callback, this, FB::FBNull(), _1, _2, _3, _4)
-	);
-
-	return 0;
-
+#	define ESC_CHAR "\\"
 #endif
-}
-
-
-void DropboxDiffPluginAPI::get_url_callback(
-	const FB::JSObjectPtr& callback,
-	bool success,
-	const FB::HeaderMap& headers,
-	const boost::shared_array<uint8_t>& data,
-	const size_t size)
-{
-	trace(string(reinterpret_cast<char*>(data.get())));
-}
 
 static string quote(const string& s)
 {

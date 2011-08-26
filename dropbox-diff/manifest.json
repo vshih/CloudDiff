@@ -20,9 +20,7 @@
 	},
 	"options_page": "options.html",
 	"permissions": [
-		"cookies",
-		"https://*.dropbox.com/*",
-		"unlimitedStorage"
+		"https://*.dropbox.com/*"
 	],
 	"plugins": [
 		{ "path": "npDropboxDiffPlugin.dll" },
