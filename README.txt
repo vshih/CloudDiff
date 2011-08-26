@@ -66,7 +66,11 @@ NPAPI implementation plugin
 
 Building
 ========
-xcodebuild -configuration MinSizeRel
+Mac
+	xcodebuild -configuration MinSizeRel
+
+Windows
+	vcbuild -configuration MinSizeRel
 
 leveldb - change CC line to: CC = g++ -arch x86_64 for optimized builds on mac
 lipo libleveldb-* -create -output libleveldb.a

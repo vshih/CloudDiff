@@ -17,6 +17,7 @@ file (GLOB GENERAL RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
     )
 
 include_directories(${PLUGIN_INCLUDE_DIRS})
+# TODO include_directories(${PLUGIN_INCLUDE_DIRS})
 
 # Generated files are stored in ${GENERATED} by the project configuration
 SET_SOURCE_FILES_PROPERTIES(
@@ -38,6 +39,7 @@ SET( SOURCES
 # depending on the platform
 include_platform()
 
-find_library(CURL_LIB curl)
-target_link_libraries(${PROJECT_NAME} ${CURL_LIB})
+#find_library(CURL_LIB curl)
+#target_link_libraries(${PROJECT_NAME} ${CURL_LIB})
+#target_link_libraries(${PROJECT_NAME} NpapiCore)
 
