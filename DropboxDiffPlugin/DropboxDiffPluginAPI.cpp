@@ -5,18 +5,33 @@
 \**********************************************************/
 
 #include "JSObject.h"
+#include "NPObjectAPI.h"
 #include "variant_list.h"
 #include "DOM/Document.h"
 
 #include "DropboxDiffPluginAPI.h"
 
-#include <curl/curl.h>
+#if defined(CURL_IMPLEMENTATION)
+#	include <curl/curl.h>
+#endif
+
+#if defined (_WIN32)
+#	include <Windows.h>
+#endif
+
+#include "NpapiTypes.h"
+//#include <npapi.h>
+
+#if defined (_WIN32)
+#	include <direct.h>
+#	define mkdir(dirname, mode) _mkdir(dirname)
+#endif
+
 #include <sys/stat.h>
 
 
 using namespace std;
 
-static CURLcode	get_file(const string& cookie, const string& url, const string& name);
 static string	tmp_dir();
 static void		replace_in_place(string& target, const string& s, const string& r);
 static string	quote(const string& s);
@@ -114,7 +129,7 @@ long DropboxDiffPluginAPI::diff(
 	const string& left_name,
 	const string& right_url,
 	const string& right_name
-) const
+)
 {
 	// Create temporary directory, if it doesn't already exist
 	string dir = tmp_dir() + "dropbox-diff/";
@@ -126,10 +141,10 @@ long DropboxDiffPluginAPI::diff(
 	}
 
 	// Download files
-	CURLcode result;
+	long result;
 
-	if ((result = get_file(cookie, left_url, dir + left_name)) != CURLE_OK) return (int)result;
-	if ((result = get_file(cookie, right_url, dir + right_name)) != CURLE_OK) return (int)result;
+	if ((result = get_file(cookie, left_url, dir + left_name)) != 0) return result;
+	if ((result = get_file(cookie, right_url, dir + right_name)) != 0) return result;
 
 	// Change directory to sandbox
 	string cmd_cd = "cd \"";
@@ -173,23 +188,26 @@ long DropboxDiffPluginAPI::diff(
 
 static string tmp_dir()
 {
-	return string(getenv(
+	return
 #if defined(_WIN32)
-		"TMP"
+		string(getenv("TMP")) + "\\"
 #else
-		"TMPDIR"
+		string(getenv("TMPDIR"))
 #endif
-	));
+	;
 }
 
-static CURLcode get_file(const string& cookie, const string& url, const string& name)
+long DropboxDiffPluginAPI::get_file(const string& cookie, const string& url, const string& name)
 {
 	// Skip if file exists already
 	struct stat s;
 
-	if (stat(name.c_str(), &s) == 0) return CURLE_OK;
+	if (stat(name.c_str(), &s) == 0) return 0;
 
 	// Download it
+
+#if defined(CURL_IMPLEMENTATION)
+
 	CURL* curl = curl_easy_init();
 
 	if (!curl) return CURLE_FAILED_INIT;
@@ -216,8 +234,36 @@ static CURLcode get_file(const string& cookie, const string& url, const string& 
 	fclose(f);
 
 	return res;
+
+#else
+
+	/*m_host->Evaluate(NULL, NPObject *npobj, NPString *script,
+                  NPVariant *result);*/
+
+	//const FB::JSObjectPtr callback(new FB::Npapi::NPObjectAPI(NULL, m_host.get()));
+	//const FB::JSObjectPtr callback(FB::FBNull);
+
+	FB::SimpleStreamHelper::AsyncGet(
+		m_host,
+		FB::URI::fromString("https://encrypted.google.com/"),
+        boost::bind(&DropboxDiffPluginAPI::get_url_callback, this, FB::FBNull(), _1, _2, _3, _4)
+	);
+
+	return 0;
+
+#endif
 }
 
+
+void DropboxDiffPluginAPI::get_url_callback(
+	const FB::JSObjectPtr& callback,
+	bool success,
+	const FB::HeaderMap& headers,
+	const boost::shared_array<uint8_t>& data,
+	const size_t size)
+{
+	trace(string(reinterpret_cast<char*>(data.get())));
+}
 
 static string quote(const string& s)
 {
