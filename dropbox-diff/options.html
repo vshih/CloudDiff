@@ -30,19 +30,25 @@ a:hover { text-decoration: underline }
 function populate_examples() {
 	var appVersion = navigator.appVersion;
 
-	var eg = [];
+	var eg;
 
 	if (appVersion.indexOf('Mac') != -1) {
-		eg.push('opendiff');
-		eg.push('/usr/local/bin/mvim -d');
+		eg = [
+			'opendiff',
+			'/usr/local/bin/mvim -d'
+		];
 	}
 	else if (appVersion.indexOf('Linux') != -1) {
-		eg.push('gvim -d');
-		eg.push('kdiff3');
+		eg = [
+			'gvim -d',
+			'kdiff3'
+		];
 	}
 	else {
-		eg.push('"%ProgramFiles%\\TortoiseSVN\\bin\\TortoiseMerge.exe"');
-		eg.push('"%ProgramFiles%\\KDiff3\\kdiff3.exe"');
+		eg = [
+			'"%ProgramFiles%\\TortoiseSVN\\bin\\TortoiseMerge.exe"',
+			'"%ProgramFiles%\\KDiff3\\kdiff3.exe"'
+		];
 	}
 
 	examples.innerHTML = '<li>' + eg.join('<li>');

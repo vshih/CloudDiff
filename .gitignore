@@ -1,10 +1,6 @@
-DropboxDiffPlugin/leveldb/lib/
+dropbox-diff/plugin
+
 .DS_Store
 *.swp
 *.svn
-
-*.plugin
-*.dll
-*.so
-
 *.zip

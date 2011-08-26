@@ -23,8 +23,8 @@
 		"https://*.dropbox.com/*"
 	],
 	"plugins": [
-		{ "path": "npDropboxDiffPlugin.dll" },
-		{ "path": "DropboxDiffPlugin.plugin" },
-		{ "path": "npDropboxDiffPlugin.so" }
+		{ "path": "plugin/npDropboxDiffPlugin.dll" },
+		{ "path": "plugin/DropboxDiffPlugin.plugin" },
+		{ "path": "plugin/npDropboxDiffPlugin.so" }
 	]
 }
