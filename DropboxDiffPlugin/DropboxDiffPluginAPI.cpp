@@ -57,7 +57,7 @@ DropboxDiffPluginAPI::DropboxDiffPluginAPI(const DropboxDiffPluginPtr& plugin, c
 
 	m_tmp_dir = tmp;
 #else
-	m_tmp_dir(P_tmpdir);
+	m_tmp_dir = P_tmpdir;
 #endif
 
 	m_tmp_dir += "/dropbox-diff/";
