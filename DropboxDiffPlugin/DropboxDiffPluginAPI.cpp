@@ -47,14 +47,7 @@ struct rm : public unary_function<string, void>
 DropboxDiffPluginAPI::DropboxDiffPluginAPI(const DropboxDiffPluginPtr& plugin, const FB::BrowserHostPtr& host) :
 	m_plugin(plugin),
 	m_host(host),
-	m_tmp_dir(
-#if defined(_WIN32)
-		string(getenv("TMP")) + "\\"
-#else
-		string(getenv("TMPDIR"))
-#endif
-		+ "dropbox-diff/"
-	),
+	m_tmp_dir(string(P_tmpdir) + "/dropbox-diff/"),
 	m_debug(false)
 {
 	// Properties
