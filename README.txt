@@ -12,8 +12,8 @@ TODO:
 
 	- NPAPI
 		- Documentation
-		- Mac universal binary?
 		- Dialog confirming initial command execution
+		+ Mac universal binary?
 		+ Linux
 		+ Spawn/fork process rather than using system()
 		+ Diff command environment variable substitution?
@@ -43,21 +43,21 @@ dropbox, diff, compare, comparison
 
 Detailed description
 --------------------
-Triggers your customized "diff" tool to compare files on Dropbox.
+Triggers your customized "diff" tool to compare files on Dropbox.  This can be TortoiseMerge, kdiff3, FileMerge, or any tool which can be triggered at the command line.
 
-In the "Previous versions" view of the Dropbox web interface, a column is added which allows you to select which versions to compare.  Click the added "Diff" button, and your configured diff tool will open, once the versions have been downloaded.
+In the "Previous versions" view of the Dropbox web interface of any file, a column is added which allows you to select two versions to compare.  Click the added "Diff" button, and your configured diff tool will open, once the versions have been downloaded.
 
-Requires an installed comparison tool, such as TortoiseMerge, KDiff3, etc.
+Supports Windows, Mac, and Linux as far as I know, though I can't be sure every possible configuration is covered.  Please let me know if you run into any issues.
 
 Documentation
 =============
 Sandbox resolution:
-- Beacon
-	- On plugin startup
-		- Write a beacon file in the Chrome sandbox
-		- Pass beacon name to the NPAPI plugin
-		- Plugin searches known sandbox directory for directory beacon
-	- Change to beacon file directory before executing diff
++ Beacon
+	+ On plugin startup
+		+ Write a beacon file in the Chrome sandbox
+		+ Pass beacon name to the NPAPI plugin
+		+ Plugin searches known sandbox directory for directory beacon
+	+ Change to beacon file directory before executing diff
 
 NPAPI implementation plugin
 - Dialog to confirm, the first time
@@ -71,6 +71,9 @@ Mac
 
 Windows
 	vcbuild -configuration MinSizeRel
+
+Linux
+	make
 
 leveldb - change CC line to: CC = g++ -arch x86_64 for optimized builds on mac
 lipo libleveldb-* -create -output libleveldb.a
