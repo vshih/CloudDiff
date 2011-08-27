@@ -52,7 +52,19 @@ function diff_onclick() {
 	if (!files.is_valid) { return }
 
 	// It's legit
-	chrome.extension.sendRequest(files, function(response) { if (response) alert('DropboxDiff error code ' + response) });
+	var body = $(document.body).addClass('progress');
+
+	chrome.extension.sendRequest(files, function(response) {
+		body.removeClass('progress');
+
+		if (response) {
+			alert(
+				'DropboxDiff failed:\n\n' +
+				response + '\n\n' +
+				'The javascript console of DropboxDiff\'s background page may have more information.'
+			);
+		}
+	});
 }
 
 

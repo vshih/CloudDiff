@@ -47,9 +47,21 @@ struct rm : public unary_function<string, void>
 DropboxDiffPluginAPI::DropboxDiffPluginAPI(const DropboxDiffPluginPtr& plugin, const FB::BrowserHostPtr& host) :
 	m_plugin(plugin),
 	m_host(host),
-	m_tmp_dir(string(P_tmpdir) + "/dropbox-diff/"),
 	m_debug(false)
 {
+	// Compute temporary directory
+#if defined(_WIN32)
+	char* tmp = getenv("TMP");
+	if (!tmp) tmp = getenv("TEMP");
+	if (!tmp) tmp = "C:\\Temp";
+
+	m_tmp_dir = tmp;
+#else
+	m_tmp_dir(P_tmpdir);
+#endif
+
+	m_tmp_dir += "/dropbox-diff/";
+
 	// Properties
 	registerProperty("debug",
 					 make_property(this,
@@ -114,7 +126,7 @@ std::string DropboxDiffPluginAPI::get_version() const
 //
 // Returns result of system() call (0 on success).
 //
-long DropboxDiffPluginAPI::diff(
+string DropboxDiffPluginAPI::diff(
 	const string& cmd,
 	const string& left_name,
 	const string& left_text,
@@ -130,42 +142,60 @@ long DropboxDiffPluginAPI::diff(
 	write_file(m_tmp_dir + left_name, left_text);
 	write_file(m_tmp_dir + right_name, right_text);
 
-	// Change to the temp directory
-	string cmd_cd = "cd \"";
-	cmd_cd += m_tmp_dir;
-	cmd_cd += "\" && ";
-
-#if defined(_WIN32)
-	// For Windows, spawn process in the background
-	cmd_cd += "start \"DropboxDiff\" ";
-#endif
-
-	cmd_cd += cmd;
+	// Do any required quoting and substitutions
+	string cmd_actual(cmd);
 
 	string q_left = quote(left_name);
 	string q_right = quote(right_name);
 
-	if (cmd.find("$1") != string::npos) {
+	if (cmd_actual.find("$1") != string::npos) {
 		// Do file name substitutions
-		replace_in_place(cmd_cd, "$1", q_left);
-		replace_in_place(cmd_cd, "$2", q_right);
+		replace_in_place(cmd_actual, "$1", q_left);
+		replace_in_place(cmd_actual, "$2", q_right);
 	}
 	else {
 		// Append file names
-		cmd_cd += ' ';
-		cmd_cd += q_left;
-		cmd_cd += ' ';
-		cmd_cd += q_right;
+		cmd_actual += ' ';
+		cmd_actual += q_left;
+		cmd_actual += ' ';
+		cmd_actual += q_right;
 	}
+
+	// Compute full command
+
+	// Change to the temp directory
+	string cmd_full = "cd \"";
+	cmd_full += m_tmp_dir;
+	cmd_full += "\" && ";
+
+#if defined(_WIN32)
+	// For Windows, spawn process in the background
+	cmd_full += "start \"DropboxDiff\" ";
+#endif
+
+	cmd_full += cmd_actual;
 
 #if !defined(_WIN32)
 	// For non-Windows, spawn process in the background
-	cmd_cd += " &";
+	cmd_full += " &";
 #endif
 
-	trace(cmd_cd);
+	trace(cmd_full);
 
-	return system(cmd_cd.c_str());
+	int code = system(cmd_full.c_str());
+
+	if (code)
+	{
+		stringstream result;
+		result
+			<< "error code: " << code << endl
+			<< "command: " << cmd_actual
+		;
+
+		return result.str();
+	}
+
+	return "";
 }
 
 

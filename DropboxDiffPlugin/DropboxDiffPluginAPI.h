@@ -29,7 +29,7 @@ public:
 	void set_debug(bool val);
 
 	// Methods
-	long diff(
+	std::string diff(
 		const std::string& cmd,
 		const std::string& left_name,
 		const std::string& left_text,

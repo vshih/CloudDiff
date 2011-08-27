@@ -1,0 +1,21 @@
+
+/* Facilitate busy pointer */
+* {
+	cursor: inherit !important;
+}
+.progress {
+	cursor: progress !important;
+}
+
+/* Keep diff button gray when pressed */
+#diff_button:active.grayed {
+	color: #666;
+	background-color: #EEE;
+	border-color: #E5E5E5 #AAA #AAA #E5E5E5;
+}
+/* Highlight diff button when pressed */
+#diff_button:active {
+	color: #4379C0;
+	background-color: #C3E8FF;
+	border-color: #5389D0 #A3C8E9 #A3C8E9 #5389D0;
+}
