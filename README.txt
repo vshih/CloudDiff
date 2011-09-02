@@ -39,13 +39,13 @@ vicshih.com
 
 
 Additional categories
-dropbox, diff, compare, comparison
+Dropbox, diff, compare, comparison, version, versioning
 
 Detailed description
 --------------------
-Triggers your customized "diff" tool to compare files on Dropbox.  This can be TortoiseMerge, kdiff3, FileMerge, or any tool which can be triggered at the command line.
+Opens your custom "diff" tool to compare file versions on Dropbox.  This can be TortoiseMerge, kdiff3, FileMerge, or any tool which can be triggered from a command line.
 
-In the "Previous versions" view of the Dropbox web interface of any file, a column is added which allows you to select two versions to compare.  Click the added "Diff" button, and your configured diff tool will open, once the versions have been downloaded.
+In the "Previous versions" view of the Dropbox web interface of any file, a column is added which allows you to select two versions to compare.  Click the Diff button, and your configured diff tool will open, once the versions have been downloaded.
 
 Supports Windows, Mac, and Linux as far as I know, though I can't be sure every possible configuration is covered.  Please let me know if you run into any issues.
 

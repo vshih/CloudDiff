@@ -1,6 +1,6 @@
 {
 	"name": "DropboxDiff",
-	"version": "1.0.1",
+	"version": "1.0.2",
 
 	"background_page": "background.html",
 	"content_scripts": [
@@ -21,6 +21,7 @@
 		"16": "16.png",
 		"48": "48.png"
 	},
+	"minimum_chrome_version": "13.0.782.215",
 	"options_page": "options.html",
 	"permissions": [
 		"https://*.dropbox.com/*",
