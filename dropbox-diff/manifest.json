@@ -23,7 +23,8 @@
 	},
 	"options_page": "options.html",
 	"permissions": [
-		"https://*.dropbox.com/*"
+		"https://*.dropbox.com/*",
+		"tabs"
 	],
 	"plugins": [
 		{ "path": "plugin/npDropboxDiffPlugin.dll" },

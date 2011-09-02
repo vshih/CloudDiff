@@ -9,7 +9,15 @@ function init() {
 	chrome.extension.onRequest.addListener(function(request, sender, send_response) {
 		var cmd = localStorage.cmd;
 
-		if (!cmd) { return send_response('DropboxDiff is not configured.  See Tools | Extensions to specify a diff tool.') }
+		if (!cmd) {
+			chrome.tabs.getSelected(null, function(tab) {
+				chrome.tabs.create({
+					url: 'options.html',
+					index: tab.index + 1
+				});
+			});
+			return send_response('');
+		}
 
 		if (!request.left || !request.right) { return }
 

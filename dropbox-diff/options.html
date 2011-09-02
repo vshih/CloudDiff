@@ -97,17 +97,13 @@ function save_options() {
 <div id='content'>
 	<h3>Diff Program</h3>
 	<p>
-		Specify the diff program used to compare different versions of files.
+		Specify how to run your diff program:
 	</p>
-	<p>
-		Use <code>$1</code> and <code>$2</code> to represent the left and right selected files.
-	</p>
-	<p>
-		Otherwise, the selected files will be passed as the first and second parameters to the specified program.
-	</p>
-	<p>
-		Specifying the full path to the program may be required.  Quote the path if it contains spaces.
-	</p>
+	<ul>
+		<li>Use <code>$1</code> and <code>$2</code> to represent the left and right selected files.
+		<li>If not specified, the file names will be quoted and appended as the first and second parameters to your program.
+		<li>Specifying the full path of your program may be required.  Quote the path if it contains spaces.
+	</ul>
 	<h4>Examples:</h4>
 	<ul id='examples'></ul>
 

@@ -10,6 +10,9 @@ var table = $('table.filebrowser');
 var C = {};
 
 
+var REV_RE = new RegExp('&(amp;)?sjid=([0-9]+)"');
+
+
 // ===== Functions
 
 
@@ -39,9 +42,23 @@ function get_files_to_diff() {
 	};
 }
 
-// Handle diff selection changes -- update "enable" status of diff button
-function diff_sel_changed() {
+function refresh_diff_button() {
+	// Update "enable" status of diff button
 	(get_files_to_diff().is_valid ? $.fn.removeClass : $.fn.addClass).call($('#diff_button'), 'grayed');
+}
+
+// Handle diff selection changes
+function diff_sel_changed(ev) {
+	// Store row content for display on other pages
+	// Uncheck the restore button first, and check the targeted button
+	var name = 'name="' + ev.target.name + '"';
+
+	localStorage[ev.target.name] = $(ev.target).closest('tr').html().replace('checked="checked"', '').replace(name, name + ' checked="checked"');
+
+	// Store current path name for validation
+	localStorage.pathname = document.location.pathname;
+
+	refresh_diff_button();
 }
 
 // Diff button handler
@@ -67,15 +84,58 @@ function diff_onclick() {
 	});
 }
 
+function insert_row(tbodies, which) {
+	var content = localStorage[which];
+
+	if (!content) { return }
+
+	var sjid = REV_RE.exec(content)[2];
+
+	var rows = tbodies[1].rows;
+	var row_count = rows.length - 1; // account for empty row
+
+	var hi_sjid = REV_RE.exec(rows[0].innerHTML)[2];
+	var lo_sjid = REV_RE.exec(rows[row_count - 1].innerHTML)[2];
+
+	var dest;
+
+	if (sjid > hi_sjid) {
+		dest = $(tbodies[0]);
+	}
+	else if (sjid < lo_sjid) {
+		dest = $(tbodies[2]);
+	}
+	else {
+		// The revision is on this page; clear it from storage
+		delete localStorage[which];
+		return;
+	}
+
+	content = $('<tr/>', {style: 'background-color: #eee'}).append(content);
+
+	// Insertion sort
+	dest.find('> tr').each(function(i, tr) {
+		var row_sjid = REV_RE.exec(tr.innerHTML)[2];
+
+		if (sjid > row_sjid) {
+			$(tr).before(content);
+			content = null;
+			return false;
+		}
+	});
+
+	if (content) { dest.append(content) }
+}
+
 
 // ===== Main
 
 
-(function() {
+(function($) {
 
 	var tbody = table.find('> tbody');
 
-	// If there's only one revision, don't bother
+	// If there's only one revision, don't bother modifying table
 	if (tbody.find('> tr:has(td > a)').length == 1) { return }
 
 	var header = table.find('> thead > tr');
@@ -99,8 +159,22 @@ function diff_onclick() {
 		'</td>'
 	);
 
+	// Add before and after tbodies
+	tbody.before($('<tbody/>')).after($('<tbody/>'));
+
+	var tbodies = table.find('> tbody');
+
+	// Check if stored row content matches current page
+	if (localStorage.pathname == document.location.pathname) {
+		insert_row(tbodies, 'diff_l');
+		insert_row(tbodies, 'diff_r');
+
+		// Add margin rows, if necessary
+		$([tbodies[0], tbodies[2]]).filter(':parent').append($('<tr><td colspan="8">&nbsp;</td></tr>'));
+	}
+
 	// Add handlers
-	tbody.find('> tr > td > input[type=radio]').click(diff_sel_changed);
+	tbodies.find('> tr > td > input[type=radio][name^="diff_"]').click(diff_sel_changed);
 
 	// Insert Diff button
 	table.next('div').prepend(
@@ -110,5 +184,7 @@ function diff_onclick() {
 	// Add handler
 	$('#diff_button').click(diff_onclick);
 
-})();
+	refresh_diff_button();
+
+})(jQuery);
 
