@@ -49,6 +49,34 @@ In the "Previous versions" view of the Dropbox web interface of any file, a colu
 
 Supports Windows, Mac, and Linux as far as I know, though I can't be sure every possible configuration is covered.  Please let me know if you run into any issues.
 
+Note that this extension requires access to "All data on your computer and the websites you visit" because the only way to trigger your locally-installed diff tool is through an NPAPI plugin.
+
+
+Votebox
+=======
+I've just written DropboxDiff, a Chrome extension to do just this. Requires Google Chrome and an installed diff tool.
+
+Get it here:  https://chrome.google.com/webstore/detail/aefdkgcdokdiaoppobphjogcilaaakka
+
+Comments can be left at http://blog.vicshih.com/2011/09/dropboxdiff-chrome-extension.html .
+
+
+Forum
+=====
+I've just written <a href="https://chrome.google.com/webstore/detail/aefdkgcdokdiaoppobphjogcilaaakka">DropboxDiff</a>, a Chrome extension to do just this. Requires Google Chrome and an installed diff tool.
+
+Comments can be left at <a href="http://blog.vicshih.com/2011/09/dropboxdiff-chrome-extension.html">http://blog.vicshih.com/2011/09/dropboxdiff-chrome-extension.html</a>.
+
+
+Wiki
+====
+= DropboxDiff =
+
+I've written [[https://chrome.google.com/webstore/detail/aefdkgcdokdiaoppobphjogcilaaakka|DropboxDiff]], a Google Chrome extension which triggers your custom diff tool to compare different versions of your text files on Dropbox.  Can be initiated from the "Previous versions" view of any one of your text files on the Dropbox website.
+
+Please leave any comments at [[http://blog.vicshih.com/2011/09/dropboxdiff-chrome-extension.html|blog.vicshih.com].
+
+
 Documentation
 =============
 Sandbox resolution:

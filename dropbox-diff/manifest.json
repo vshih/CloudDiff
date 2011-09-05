@@ -1,6 +1,6 @@
 {
 	"name": "DropboxDiff",
-	"version": "1.0.2.1",
+	"version": "1.0.2.3",
 
 	"background_page": "background.html",
 	"content_scripts": [
@@ -24,8 +24,7 @@
 	"minimum_chrome_version": "13.0.782.215",
 	"options_page": "options.html",
 	"permissions": [
-		"https://*.dropbox.com/*",
-		"tabs"
+		"https://*.dropbox.com/*"
 	],
 	"plugins": [
 		{ "path": "plugin/npDropboxDiffPlugin.dll" },

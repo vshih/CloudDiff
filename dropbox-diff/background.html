@@ -10,12 +10,7 @@ function init() {
 		var cmd = localStorage.cmd;
 
 		if (!cmd) {
-			chrome.tabs.getSelected(null, function(tab) {
-				chrome.tabs.create({
-					url: 'options.html',
-					index: tab.index + 1
-				});
-			});
+			chrome.tabs.create({ url: 'options.html' });
 			return send_response('');
 		}
 
