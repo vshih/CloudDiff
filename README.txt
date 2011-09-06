@@ -2,6 +2,8 @@
 TODO:
 	- Extension
 		+ Options page
+			+ Add example:
+				+ bash -c '"$HOME/bin/tkdiff" $1 $2'
 			- File extension-specific command configuration
 		- Progress bars
 		+ Screenshots
@@ -74,7 +76,7 @@ Wiki
 
 I've written [[https://chrome.google.com/webstore/detail/aefdkgcdokdiaoppobphjogcilaaakka|DropboxDiff]], a Google Chrome extension which triggers your custom diff tool to compare different versions of your text files on Dropbox.  Can be initiated from the "Previous versions" view of any one of your text files on the Dropbox website.
 
-Please leave any comments at [[http://blog.vicshih.com/2011/09/dropboxdiff-chrome-extension.html|blog.vicshih.com].
+Please leave any comments at [[http://blog.vicshih.com/2011/09/dropboxdiff-chrome-extension.html|blog.vicshih.com]].
 
 
 Documentation
