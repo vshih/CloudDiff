@@ -49,9 +49,13 @@ Opens your custom "diff" tool to compare file versions on Dropbox.  This can be 
 
 In the "Previous versions" view of the Dropbox web interface of any file, a column is added which allows you to select two versions to compare.  Click the Diff button, and your configured diff tool will open, once the versions have been downloaded.
 
-Supports Windows, Mac, and Linux as far as I know, though I can't be sure every possible configuration is covered.  Please let me know if you run into any issues.
+Supports Windows, Mac, and Linux as far as I know, though I can't be sure every possible configuration is covered.
 
 Note that this extension requires access to "All data on your computer and the websites you visit" because the only way to trigger your locally-installed diff tool is through an NPAPI plugin.
+
+Please let me know if you run into any issues at http://blog.vicshih.com/2011/09/dropboxdiff-chrome-extension.html .
+
+2011-09-12 update (version 1.0.2.4) - Added extension description. Added example cygwin command line for Windows.
 
 
 Votebox
