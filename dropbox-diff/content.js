@@ -6,8 +6,12 @@
 // Reference to revision table
 var table = $('table.filebrowser');
 
-// Column index constants
-var C = {};
+// Column index constants; 0-base indexed
+var C = {
+	PREVIEW: 1,
+	DIFF: 2,
+	CHANGED: 4
+};
 
 
 var REV_RE = new RegExp('&(amp;)?sjid=([0-9]+)"');
@@ -137,19 +141,6 @@ function insert_row(tbodies, which) {
 
 	// If there's only one revision, don't bother modifying table
 	if (tbody.find('> tr:has(td > a)').length == 1) { return }
-
-	var header = table.find('> thead > tr');
-
-	C.CHANGED = header.find('> th:contains(Changed)')[0].cellIndex;
-
-	// Insert Diff column header, after the Preview column
-	var preview = header.find('> th:contains(Preview)');
-
-	C.PREVIEW = preview[0].cellIndex + 1; // account for "Event" column having colSpan = 2
-
-	preview.after('<th>Diff</th>');
-
-	C.DIFF = C.PREVIEW + 1;
 
 	// Insert Diff column for each row
 	tbody.find('> tr > td:nth-child(' + (C.PREVIEW + 1) + ')').after(
