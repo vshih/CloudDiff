@@ -10,7 +10,7 @@ var table = $('table.filebrowser');
 var C = {
 	PREVIEW: 1,
 	DIFF: 2,
-	CHANGED: 4
+	CHANGED: 5
 };
 
 

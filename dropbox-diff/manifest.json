@@ -1,7 +1,7 @@
 {
 	"name": "DropboxDiff",
 	"description": "Compare versions of your Dropbox files with your configured diff tool. Trigger from any \"Previous versions\" page on Dropbox.",
-	"version": "1.0.2.5",
+	"version": "1.0.2.6",
 
 	"background_page": "background.html",
 	"content_scripts": [

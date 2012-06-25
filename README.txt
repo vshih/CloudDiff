@@ -57,6 +57,7 @@ Please let me know if you run into any issues at http://blog.vicshih.com/2011/09
 
 2011-09-12 update (version 1.0.2.4) - Added extension description. Added example cygwin command line for Windows.
 
+2012-06-24 update (version 1.0.2.6) - Handle site change (table header removed).
 
 Votebox
 =======
