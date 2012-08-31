@@ -1,0 +1,23 @@
+body { background-color: #f0f0f0 }
+* { font-family: Tahoma, Helvetica, Arial }
+code, #examples li { font-family: Courier New }
+p { color: #505050; font-size: 11pt }
+h4 { font-weight: normal; margin-bottom: 0 }
+a { text-decoration: none }
+a:hover { text-decoration: underline }
+
+#flash { text-align: center }
+#saved { visibility: hidden; background-color: yellow; padding: 4px 8px 4px 12px; border-radius: 8px }
+#saved.show { visibility: visible }
+
+#margin { padding: 0 30px 0 20px; width: 252px }
+#content {
+	position: absolute;
+	left: 253px;
+	top: 20px;
+	padding-left: 25px;
+	border-left: 1px dotted gray;
+	height: 90%;
+}
+
+.clear { clear: both; padding: 10px }

@@ -1,92 +1,9 @@
 <html>
 <head><title>DropboxDiff Options</title>
-<style>
-body { background-color: #f0f0f0 }
-* { font-family: Tahoma, Helvetica, Arial }
-code, #examples li { font-family: Courier New }
-p { color: #505050; font-size: 11pt }
-h4 { font-weight: normal; margin-bottom: 0 }
-a { text-decoration: none }
-a:hover { text-decoration: underline }
-
-#flash { text-align: center }
-#saved { visibility: hidden; background-color: yellow; padding: 4px 8px 4px 12px; border-radius: 8px }
-#saved.show { visibility: visible }
-
-#margin { padding: 0 30px 0 20px; width: 252px }
-#content {
-	position: absolute;
-	left: 253px;
-	top: 20px;
-	padding-left: 25px;
-	border-left: 1px dotted gray;
-	height: 90%;
-}
-
-.clear { clear: both; padding: 10px }
-</style>
-<script type='text/javascript'>
-
-function populate_examples() {
-	var appVersion = navigator.appVersion;
-
-	var eg;
-
-	if (appVersion.indexOf('Mac') != -1) {
-		eg = [
-			'opendiff',
-			'/usr/local/bin/mvim -d'
-		];
-	}
-	else if (appVersion.indexOf('Linux') != -1) {
-		eg = [
-			'gvim -d',
-			'kdiff3'
-		];
-	}
-	else {
-		eg = [
-			'"%ProgramFiles%\\TortoiseSVN\\bin\\TortoiseMerge.exe"',
-			'"%ProgramFiles%\\KDiff3\\kdiff3.exe"',
-			'bash -c \'"$HOME/bin/tkdiff" $1 $2\''
-		];
-	}
-
-	examples.innerHTML = '<li>' + eg.join('<li>');
-}
-
-function init() {
-	populate_examples();
-	restore_options();
-
-	// Set up change handler
-	var inputs = [
-		cmd
-	];
-
-	for (var i in inputs) { inputs[i].onchange = onchange }
-}
-
-// Read from localStorage
-function restore_options() {
-	cmd.value = localStorage.cmd || '';
-}
-
-function onchange() {
-	save_options();
-}
-
-function save_options() {
-	localStorage.cmd = cmd.value;
-
-	// Show feedback
-	saved.className = 'show';
-	setTimeout(function() { saved.className = '' }, 1200);
-}
-
-</script>
+<link rel='stylesheet' type='text/css' href='options.css' />
+<script src='options.js'></script>
 </head>
-<body onload='init()'>
+<body>
 <div id='flash'>
 	<span id='saved'>Saved.</span>
 </div>

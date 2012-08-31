@@ -1,7 +1,7 @@
 {
 	"name": "DropboxDiff",
 	"description": "Compare versions of your Dropbox files with your configured diff tool. Trigger from any \"Previous versions\" page on Dropbox.",
-	"version": "1.0.2.7",
+	"version": "1.0.2.8",
 
 	"manifest_version": 2,
 	"background": {
@@ -13,13 +13,14 @@
 				"styles.css"
 			],
 			"js": [
-				"jquery-1.6.2.min.js",
+				"jquery-1.8.0.min.js",
 				"content.js"
 			],
 			"matches": [ "https://www.dropbox.com/revisions/*" ],
 			"run_at": "document_end"
 		}
 	],
+	"content_security_policy": "default-src 'self' https://*.dropbox.com",
 	"icons": {
 		"128": "128.png",
 		"16": "16.png",
