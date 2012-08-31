@@ -75,7 +75,7 @@ function diff_onclick() {
 	// It's legit
 	var body = $(document.body).addClass('progress');
 
-	chrome.extension.sendRequest(files, function(response) {
+	chrome.extension.sendMessage(files, function(response) {
 		body.removeClass('progress');
 
 		if (response) {

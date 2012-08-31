@@ -59,6 +59,8 @@ Please let me know if you run into any issues at http://blog.vicshih.com/2011/09
 
 2012-06-24 update (version 1.0.2.6) - Handle site change (table header removed).
 
+2012-08-31 update (version 1.0.2.7) - Update to manifest version 2.
+
 Votebox
 =======
 I've just written DropboxDiff, a Chrome extension to do just this. Requires Google Chrome and an installed diff tool.
