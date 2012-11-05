@@ -63,6 +63,8 @@ Please let me know if you run into any issues at http://blog.vicshih.com/2011/09
 
 2012-08-31 update (version 1.0.2.8) - Better content security policy settings, upgrade to jQuery 1.8.0.
 
+2012-11-05 update (version 1.0.2.9) - Fix for Mac - upgraded to FireBreath 1.7 (774c948f5e).
+
 Votebox
 =======
 I've just written DropboxDiff, a Chrome extension to do just this. Requires Google Chrome and an installed diff tool.
@@ -116,6 +118,10 @@ Linux
 
 leveldb - change CC line to: CC = g++ -arch x86_64 for optimized builds on mac
 lipo libleveldb-* -create -output libleveldb.a
+
+Updating FireBreath
+===================
+- https://groups.google.com/forum/?fromgroups=#!topic/firebreath-dev/-XIhxC9-aY4
 
 References:
 - http://www.firebreath.org/display/documentation/FireBreath+Home

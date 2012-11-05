@@ -39,7 +39,7 @@ set(FBSTRING_LegalCopyright "Copyright 2011 Victor Shih")
 set(FBSTRING_PluginFileName "np${PLUGIN_NAME}.dll")
 set(FBSTRING_ProductName "DropboxDiff Plug-in")
 set(FBSTRING_FileExtents "")
-set(FBSTRING_PluginName "DropboxDiff Plug-in")
+set(FBSTRING_PluginName "DropboxDiffPlugin")
 set(FBSTRING_MIMEType "application/x-dropbox-diff-plugin")
 
 # Uncomment this next line if you're not planning on your plugin doing
