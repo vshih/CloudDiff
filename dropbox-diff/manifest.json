@@ -1,7 +1,7 @@
 {
 	"name": "DropboxDiff",
 	"description": "Compare versions of your Dropbox files with your configured diff tool. Trigger from any \"Previous versions\" page on Dropbox.",
-	"version": "1.0.2.9",
+	"version": "1.0.2.10",
 
 	"manifest_version": 2,
 	"background": {
@@ -32,8 +32,9 @@
 		"https://*.dropbox.com/*"
 	],
 	"plugins": [
-		{ "path": "plugin/npDropboxDiffPlugin.dll" },
 		{ "path": "plugin/DropboxDiffPlugin.plugin" },
-		{ "path": "plugin/npDropboxDiffPlugin.so" }
+		{ "path": "plugin/npDropboxDiffPlugin.dll" },
+		{ "path": "plugin/npDropboxDiffPlugin-i686.so" },
+		{ "path": "plugin/npDropboxDiffPlugin-x86_64.so" }
 	]
 }

@@ -32,6 +32,7 @@ function get_file_info(which) {
 	};
 }
 
+
 // Retrieve info of files to diff {is_valid, left, right}
 function get_files_to_diff() {
 	var left = get_file_info('l');
@@ -50,6 +51,7 @@ function refresh_diff_button() {
 	(get_files_to_diff().is_valid ? $.fn.removeClass : $.fn.addClass).call($('#diff_button'), 'grayed');
 }
 
+
 // Handle diff selection changes
 function diff_sel_changed(ev) {
 	// Store row content for display on other pages
@@ -63,6 +65,7 @@ function diff_sel_changed(ev) {
 
 	refresh_diff_button();
 }
+
 
 // Diff button handler
 function diff_onclick() {
@@ -79,13 +82,14 @@ function diff_onclick() {
 
 		if (response) {
 			alert(
-				'DropboxDiff failed:\n\n' +
+				'DropboxDiff failed with\n\n' +
 				response + '\n\n' +
-				'The javascript console of DropboxDiff\'s background page may have more information.'
+				'The javascript console of DropboxDiff\'s "background.html" page may have more information.'
 			);
 		}
 	});
 }
+
 
 function insert_row(tbodies, which) {
 	var content = localStorage[which];
@@ -164,7 +168,7 @@ function insert_row(tbodies, which) {
 	}
 
 	// Add handlers
-	tbodies.find('> tr > td > input[type=radio][name^="diff_"]').click(diff_sel_changed);
+	tbodies.find('> tr > td > input[type="radio"][name^="diff_"]').click(diff_sel_changed);
 
 	// Insert Diff button
 	table.next('div').prepend(

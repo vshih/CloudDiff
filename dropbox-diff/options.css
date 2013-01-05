@@ -21,3 +21,7 @@ a:hover { text-decoration: underline }
 }
 
 .clear { clear: both; padding: 10px }
+
+label { display: inline-block; width: 100px }
+
+#cmd { width: 400px }

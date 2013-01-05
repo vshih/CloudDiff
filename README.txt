@@ -55,15 +55,17 @@ Note that this extension requires access to "All data on your computer and the w
 
 Please let me know if you run into any issues at http://blog.vicshih.com/2011/09/dropboxdiff-chrome-extension.html .
 
-2011-09-12 update (version 1.0.2.4) - Added extension description. Added example cygwin command line for Windows.
+2013-01-05 update (version 1.0.2.10) - Fixed to support 64-bit linux.  Added a Test button to the options page.
 
-2012-06-24 update (version 1.0.2.6) - Handle site change (table header removed).
-
-2012-08-31 update (version 1.0.2.7) - Update to manifest version 2.
+2012-11-05 update (version 1.0.2.9) - Fix for Mac - upgraded to FireBreath 1.7 (774c948f5e).
 
 2012-08-31 update (version 1.0.2.8) - Better content security policy settings, upgrade to jQuery 1.8.0.
 
-2012-11-05 update (version 1.0.2.9) - Fix for Mac - upgraded to FireBreath 1.7 (774c948f5e).
+2012-08-31 update (version 1.0.2.7) - Update to manifest version 2.
+
+2012-06-24 update (version 1.0.2.6) - Handle site change (table header removed).
+
+2011-09-12 update (version 1.0.2.4) - Added extension description. Added example cygwin command line for Windows.
 
 Votebox
 =======

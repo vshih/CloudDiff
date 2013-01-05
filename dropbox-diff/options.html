@@ -13,11 +13,12 @@
 	<a href='http://blog.vicshih.com/2011/09/dropboxdiff-chrome-extension.html'>blog.vicshih.com</a>
 </div>
 <div id='content'>
-	<h3>Diff Program</h3>
+	<h3>External Diff Tool</h3>
 	<p>
-		Specify how to run your diff program:
+		Specify how to run your external diff tool:
 	</p>
 	<ul>
+		<li>Install a diff tool, if necessary (<a href="http://kdiff3.sourceforge.net/">kdiff3</a>, for example).
 		<li>Use <code>$1</code> and <code>$2</code> to represent the left and right selected files.
 		<li>If not specified, the file names will be quoted and appended as the first and second parameters to your program.
 		<li>Specifying the full path of your program may be required.  Quote the path if it contains spaces.
@@ -25,7 +26,9 @@
 	<h4>Examples:</h4>
 	<ul id='examples'></ul>
 
-	<input type='text' id='cmd' size='100' />
+	<label for='cmd'>Command:</label>
+	<input type='text' id='cmd' />
+	<button id='config-test'>Test</button>
 </div>
 </body>
 </html>
