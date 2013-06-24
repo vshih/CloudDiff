@@ -1,11 +1,12 @@
 {
 	"name": "DropboxDiff",
 	"description": "Compare versions of your Dropbox files with your configured diff tool. Trigger from any \"Previous versions\" page on Dropbox.",
-	"version": "1.0.2.10",
+	"version": "1.0.2.11",
 
 	"manifest_version": 2,
 	"background": {
-		"page": "background.html"
+		"page": "background.html",
+		"persistent": false
 	},
 	"content_scripts": [
 		{
@@ -26,7 +27,7 @@
 		"16": "16.png",
 		"48": "48.png"
 	},
-	"minimum_chrome_version": "13.0.782.215",
+	"minimum_chrome_version": "22.0.0.0",
 	"options_page": "options.html",
 	"permissions": [
 		"https://*.dropbox.com/*"

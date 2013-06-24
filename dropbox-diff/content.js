@@ -2,10 +2,10 @@
 // ===== Globals
 
 
-// Reference to revision table
+// Reference to revision table.
 var table = $('table.filebrowser');
 
-// Column index constants; 0-base indexed
+// Column index constants; 0-base indexed.
 var C = {
 	PREVIEW: 1,
 	DIFF: 2,
@@ -33,7 +33,7 @@ function get_file_info(which) {
 }
 
 
-// Retrieve info of files to diff {is_valid, left, right}
+// Retrieve info of files to diff {is_valid, left, right}.
 function get_files_to_diff() {
 	var left = get_file_info('l');
 	var right = get_file_info('r');
@@ -47,47 +47,69 @@ function get_files_to_diff() {
 }
 
 function refresh_diff_button() {
-	// Update "enable" status of diff button
+	// Update "enable" status of diff button.
 	(get_files_to_diff().is_valid ? $.fn.removeClass : $.fn.addClass).call($('#diff_button'), 'grayed');
 }
 
 
-// Handle diff selection changes
+// Handle diff selection changes.
 function diff_sel_changed(ev) {
-	// Store row content for display on other pages
-	// Uncheck the restore button first, and check the targeted button
+	// Store row content for display on other pages.
+	// Uncheck the restore button first, and check the targeted button.
 	var name = 'name="' + ev.target.name + '"';
 
 	localStorage[ev.target.name] = $(ev.target).closest('tr').html().replace('checked="checked"', '').replace(name, name + ' checked="checked"');
 
-	// Store current path name for validation
+	// Store current path name for validation.
 	localStorage.pathname = document.location.pathname;
 
 	refresh_diff_button();
 }
 
 
-// Diff button handler
+// Diff button handler.
 function diff_onclick() {
-	// Retrieve left and right previews
+	// Retrieve left and right previews.
 	var files = get_files_to_diff();
 
 	if (!files.is_valid) { return }
 
-	// It's legit
+	// It's legit.
 	var body = $(document.body).addClass('progress');
+	var cleanup = function () { body.removeClass('progress'); };
 
-	chrome.extension.sendMessage(files, function(response) {
-		body.removeClass('progress');
+	var tries = 3;
 
-		if (response) {
-			alert(
-				'DropboxDiff failed with\n\n' +
-				response + '\n\n' +
-				'The javascript console of DropboxDiff\'s "background.html" page may have more information.'
-			);
+	var callback = function (response) {
+		switch (response) {
+			case '':
+				// Success.
+				cleanup();
+				break;
+
+			case null:
+			case undefined:
+				// Probably the event page was inactive; try again after a short delay.  Note that this seems like a Chrome bug.
+				--tries;
+				if (tries) {
+					setTimeout(function () { chrome.runtime.sendMessage(files, callback); }, 500);
+					break;
+				}
+				// else fall through.
+
+			default:
+				// Maybe a plugin failure; display it.
+				alert(
+					'DropboxDiff failed with\n\n' +
+					response + '\n\n' +
+					'The JavaScript console of DropboxDiff\'s "background.html" page may have more information.'
+				);
+				cleanup();
+				break;
 		}
-	});
+	};
+
+	chrome.runtime.sendMessage(files, callback);
 }
 
 
@@ -113,15 +135,15 @@ function insert_row(tbodies, which) {
 		dest = $(tbodies[2]);
 	}
 	else {
-		// The revision is on this page; clear it from storage
+		// The revision is on this page; clear it from storage.
 		delete localStorage[which];
 		return;
 	}
 
 	content = $('<tr/>', {style: 'background-color: #eee'}).append(content);
 
-	// Insertion sort
-	dest.find('> tr').each(function(i, tr) {
+	// Insertion sort.
+	dest.find('> tr').each(function (i, tr) {
 		var row_sjid = REV_RE.exec(tr.innerHTML)[2];
 
 		if (sjid > row_sjid) {
@@ -138,11 +160,11 @@ function insert_row(tbodies, which) {
 // ===== Main
 
 
-(function($) {
+(function ($) {
 
 	var tbody = table.find('> tbody');
 
-	// If there's only one revision, don't bother modifying table
+	// If there's only one revision, don't bother modifying table.
 	if (tbody.find('> tr:has(td > a)').length == 1) { return }
 
 	// Insert Diff column for each row
@@ -153,29 +175,29 @@ function insert_row(tbodies, which) {
 		'</td>'
 	);
 
-	// Add before and after tbodies
+	// Add before and after tbodies.
 	tbody.before($('<tbody/>')).after($('<tbody/>'));
 
 	var tbodies = table.find('> tbody');
 
-	// Check if stored row content matches current page
+	// Check if stored row content matches current page.
 	if (localStorage.pathname == document.location.pathname) {
 		insert_row(tbodies, 'diff_l');
 		insert_row(tbodies, 'diff_r');
 
-		// Add margin rows, if necessary
+		// Add margin rows, if necessary.
 		$([tbodies[0], tbodies[2]]).filter(':parent').append($('<tr><td colspan="8">&nbsp;</td></tr>'));
 	}
 
-	// Add handlers
+	// Add handlers.
 	tbodies.find('> tr > td > input[type="radio"][name^="diff_"]').click(diff_sel_changed);
 
-	// Insert Diff button
+	// Insert Diff button.
 	table.next('div').prepend(
 		'<input id="diff_button" type="button" value="Diff" class="button grayed" />&nbsp;&nbsp;&nbsp;'
 	);
 
-	// Add handler
+	// Add handler.
 	$('#diff_button').click(diff_onclick);
 
 	refresh_diff_button();

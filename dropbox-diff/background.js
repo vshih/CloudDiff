@@ -2,19 +2,19 @@
 function init() {
 	diff_plugin.debug = 1;
 
-	// Set up request listener
-	chrome.extension.onMessage.addListener(function (request, sender, send_response) {
+	// Set up request listener.
+	chrome.runtime.onMessage.addListener(function (request, sender, send_response) {
 		var cmd = localStorage.cmd;
 
 		if (!cmd) {
-			// Serialize request and pass on to the options page
+			// Serialize request and pass on to the options page.
 			chrome.tabs.create({ url: 'options.html#' + JSON.stringify(request) });
 			return send_response('');
 		}
 
 
 		if (request.test) {
-			// Test run.  Generate a timestamp to make each test file unique
+			// Test run.  Generate a timestamp to make each test file unique.
 			function pad2(s) {
 				s = s.toString();
 				while (s.length < 2) { s = '0' + s }
@@ -55,7 +55,7 @@ function init() {
 		else {
 			if (!request.left || !request.right) { return }
 
-			// Allocate a place to collect file contents
+			// Allocate a place to collect file contents.
 			var data = {
 				left: {
 					name: compute_file_name(request.left.url, request.left.changed)
@@ -69,7 +69,7 @@ function init() {
 			$.get(request.right.url, function(text) { data.right.text = text; recv(data, send_response) });
 		}
 
-		// We must return true in order to send a response after the listener returns
+		// We must return true in order to send a response after the listener returns.
 		return true;
 	});
 }
@@ -97,7 +97,7 @@ function sanitize_dropbox_date(d) {
 
 
 function compute_file_name(url, changed) {
-	// Extract filename and revision ("sjid" parameter)
+	// Extract filename and revision ("sjid" parameter).
 	var rev = url.substr(url.lastIndexOf('=') + 1);
 
 	var basename = url.substr(url.lastIndexOf('/') + 1);
@@ -107,8 +107,8 @@ function compute_file_name(url, changed) {
 	var ext = dot == -1 ? '' : basename.substr(dot);
 	var base = basename.substr(0, basename.length - ext.length);
 
-	// Append revision to ensure uniqueness
-	// Keep extension, in case diff tool can use it
+	// Append revision to ensure uniqueness.
+	// Keep extension, in case diff tool can use it.
 	return sanitize_dropbox_date(changed) + ' ' + base + ' ' + rev + ext;
 }
 
