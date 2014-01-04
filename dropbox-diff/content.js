@@ -13,7 +13,8 @@ var C = {
 };
 
 
-var REV_RE = new RegExp('&(amp;)?sjid=([0-9]+)"');
+var REV_RE				= /(\?|&(amp;)?)sjid=([0-9]+)/;
+var REV_RE_INDEX	= 3;
 
 
 // ===== Functions
@@ -58,7 +59,8 @@ function diff_sel_changed(ev) {
 	// Uncheck the restore button first, and check the targeted button.
 	var name = 'name="' + ev.target.name + '"';
 
-	localStorage[ev.target.name] = $(ev.target).closest('tr').html().replace('checked="checked"', '').replace(name, name + ' checked="checked"');
+	localStorage[ev.target.name] = $(ev.target).closest('tr').html().
+		replace('checked="checked"', '').replace(name, name + ' checked="checked"');
 
 	// Store current path name for validation.
 	localStorage.pathname = document.location.pathname;
@@ -118,13 +120,13 @@ function insert_row(tbodies, which) {
 
 	if (!content) { return }
 
-	var sjid = REV_RE.exec(content)[2];
+	var sjid = REV_RE.exec(content)[REV_RE_INDEX];
 
 	var rows = tbodies[1].rows;
 	var row_count = rows.length - 1; // account for empty row
 
-	var hi_sjid = REV_RE.exec(rows[0].innerHTML)[2];
-	var lo_sjid = REV_RE.exec(rows[row_count - 1].innerHTML)[2];
+	var hi_sjid = REV_RE.exec(rows[0].innerHTML)[REV_RE_INDEX];
+	var lo_sjid = REV_RE.exec(rows[row_count - 1].innerHTML)[REV_RE_INDEX];
 
 	var dest;
 
@@ -144,7 +146,7 @@ function insert_row(tbodies, which) {
 
 	// Insertion sort.
 	dest.find('> tr').each(function (i, tr) {
-		var row_sjid = REV_RE.exec(tr.innerHTML)[2];
+		var row_sjid = REV_RE.exec(tr.innerHTML)[REV_RE_INDEX];
 
 		if (sjid > row_sjid) {
 			$(tr).before(content);
@@ -167,11 +169,11 @@ function insert_row(tbodies, which) {
 	// If there's only one revision, don't bother modifying table.
 	if (tbody.find('> tr:has(td > a)').length == 1) { return }
 
-	// Insert Diff column for each row
+	// Insert Diff column for each row.
 	tbody.find('> tr > td:nth-child(' + (C.PREVIEW + 1) + ')').after(
 		'<td>' +
-			'<input type="radio" name="diff_l" title="left side" />' +
-			'<input type="radio" name="diff_r" title="right side" />' +
+			'<input type="radio" name="diff_l" title="left side"/>' +
+			'<input type="radio" name="diff_r" title="right side"/>' +
 		'</td>'
 	);
 
@@ -194,7 +196,7 @@ function insert_row(tbodies, which) {
 
 	// Insert Diff button.
 	table.next('div').prepend(
-		'<input id="diff_button" type="button" value="Diff" class="button grayed" />&nbsp;&nbsp;&nbsp;'
+		'<input id="diff_button" type="button" value="Diff" class="freshbutton-lightblue grayed" style="margin-right: 552px"/>'
 	);
 
 	// Add handler.
