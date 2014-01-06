@@ -1,5 +1,5 @@
 
-/* Facilitate busy pointer */
+/* Facilitate busy pointer. */
 * {
 	cursor: inherit !important;
 }
@@ -7,15 +7,49 @@
 	cursor: progress !important;
 }
 
-/* Keep diff button gray when pressed */
-#diff_button:active.grayed {
-	color: #666;
-	background-color: #EEE;
-	border-color: #E5E5E5 #AAA #AAA #E5E5E5;
+/* Disable diff buttons' hover effect when grayed. */
+.diff_button:hover.grayed {
+	background: -webkit-gradient(linear, left top, left bottom, from(#fffffe), to(#f4faff));
 }
-/* Highlight diff button when pressed */
-#diff_button:active {
-	color: #4379C0;
-	background-color: #C3E8FF;
-	border-color: #5389D0 #A3C8E9 #A3C8E9 #5389D0;
+#exdiff_button {
+	margin-right: 521px;
+}
+
+/* Differentiate added rows. */
+.tr-added {
+	background-color: #eee;
+}
+
+
+/* Dropbox overrides. */
+#file-preview-modal .content-item {
+	text-align: left;
+}
+#file-preview-modal #indiff-view {
+	background-color: white;
+	color: black;
+	margin: auto;
+	overflow-y: scroll;
+	width: 100%;
+	/* height must be calculated dynamically. */
+}
+
+
+/* jsdifflib overrides. */
+table.diff {
+	width: 100%;
+}
+
+/* Use Dropbox's fonts. */
+table.diff tbody { 
+	font-family: "Consolas", "Bitstream Vera Sans Mono", "Courier New", Courier, monospace;
+}
+table.diff thead,
+table.diff tbody th {
+	font-family: "Open Sans", "lucida grande", "Segoe UI", arial, verdana, "lucida sans unicode", tahoma, sans-serif;
+}
+
+/* Adjust vertical alignment of lines slightly. */
+table.diff tbody td {
+	padding: .2em;
 }

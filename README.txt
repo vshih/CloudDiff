@@ -55,6 +55,8 @@ Note that this extension requires access to "All data on your computer and the w
 
 Please let me know if you run into any issues at http://blog.vicshih.com/2011/09/dropboxdiff-chrome-extension.html .
 
+2014-01-05 update (version 1.0.2.13) - Inline diff implemented.
+
 2014-01-04 update (version 1.0.2.12) - Account for "sjid" parameter in any position.  Distinguish Diff button better.
 
 2013-06-23 update (version 1.0.2.11) - Switch from background page to event page.
