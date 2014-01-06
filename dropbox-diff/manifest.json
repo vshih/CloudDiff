@@ -1,6 +1,7 @@
 {
 	"name": "DropboxDiff",
-	"description": "Compare versions of your Dropbox files with your configured diff tool. Trigger from any \"Previous versions\" page on Dropbox.",
+	"short_name": "DropboxDiff",
+	"description": "Compare versions of your Dropbox files in-browser or with your configured diff tool. Trigger from any \"Previous versions\" page.",
 	"version": "1.0.2.13",
 
 	"manifest_version": 2,

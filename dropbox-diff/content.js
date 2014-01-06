@@ -274,6 +274,9 @@ function get_file_text(url) {
 
 	var tbody = $REV_TABLE.find('> tbody');
 
+	// If there's only one revision, don't bother modifying table.
+	if (tbody.find('> tr:has(td > a)').length == 1) { return }
+
 	// Insert diff column for each row.
 	tbody.find('> tr > td:nth-child(' + (C.PREVIEW + 1) + ')').after(
 		'<td>' +
