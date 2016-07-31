@@ -1,0 +1,5 @@
+{
+	"name": "DropboxDiff",
+	"main": "index.html",
+	"node-remote": "https://www.dropbox.com,<local>"
+}
