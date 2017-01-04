@@ -21,9 +21,12 @@
 				"diffview.js",
 				"content.js"
 			],
-			"matches": [ "https://www.dropbox.com/revisions/*" ],
+			"matches": [ "https://www.dropbox.com/history/*" ],
 			"run_at": "document_end"
 		}
+	],
+	"web_accessible_resources": [
+		"icon_spacer-vflN3BYt2.gif"
 	],
 	"content_security_policy": "default-src 'self' https://*.dropbox.com",
 	"icons": {
@@ -34,12 +37,7 @@
 	"minimum_chrome_version": "22.0.0.0",
 	"options_page": "options.html",
 	"permissions": [
-		"https://*.dropbox.com/*"
-	],
-	"plugins": [
-		{ "path": "plugin/DropboxDiffPlugin.plugin" },
-		{ "path": "plugin/npDropboxDiffPlugin.dll" },
-		{ "path": "plugin/npDropboxDiffPlugin-i686.so" },
-		{ "path": "plugin/npDropboxDiffPlugin-x86_64.so" }
+		"https://*.dropbox.com/*",
+		"nativeMessaging"
 	]
 }
