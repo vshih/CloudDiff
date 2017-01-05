@@ -150,11 +150,14 @@ function initBookmarksMounted() {
 
 
 // Insert diff buttons and handlers.
+// TODO reenable external diff button when implemented.
 function injectDiffButtons() {
 	$('#inner-page-header').prepend(`
 		<div style="display: inline-block; margin-left: 189px">
+<!--
 			<button id="exdiff" class="diff-button freshbutton-lightblue" disabled>Diff</button>
-			<button id="indiff" class="diff-button freshbutton-lightblue" disabled>Inline</button>
+ -->
+			<button id="indiff" class="diff-button freshbutton-lightblue" disabled>Inline Diff</button>
 		</div>
 	`);
 

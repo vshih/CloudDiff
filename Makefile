@@ -5,5 +5,6 @@ help:
 zip:	dropbox-diff.zip
 
 dropbox-diff.zip:	dropbox-diff
-	@zip -r $@ $^
+	-rm -f $@
+	@zip -r $@ $^ -x \*.swp
 

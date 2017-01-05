@@ -45,15 +45,22 @@ Dropbox, diff, compare, comparison, version, versioning
 
 Detailed description
 --------------------
-Provides two options for comparing different versions of your Dropbox files:  1) a side-by-side diff within your browser, or 2) an external diff tool.  This can be TortoiseMerge, kdiff3, FileMerge, or any tool which can be triggered from a command line.
 
-In the "Previous versions" view of the Dropbox web interface of any file, a column is added which allows you to select two versions to compare.  Click the Inline button to view the difference in-browser, or the Diff button to trigger your configured diff tool.
+Current Version Release Notes:
+
+2016-01-05 update (version 1.0.2.14) - Inline diff restored; external diff support coming soon.  Removed NPAPI requirement, since it is no longer supported.
+
+
+Provides two options for comparing different versions of your Dropbox files:  1) a side-by-side diff within your browser, or 2) an external diff tool (to be restored soon).  This can be TortoiseMerge, kdiff3, FileMerge, or any tool which can be triggered from a command line.
+
+In the "Previous versions" view of the Dropbox web interface of any file, a column is added which allows you to select two versions to compare.  Click the "Inline Diff" button to view the difference in-browser, or the Diff button to trigger your configured diff tool.
 
 Supports Windows, Mac, and Linux as far as I know, though I can't be sure every possible configuration is covered.
 
-Note that this extension requires access to "All data on your computer and the websites you visit" because the only way to trigger your locally-installed diff tool is through an NPAPI plugin.
-
 Please let me know if you run into any issues at http://blog.vicshih.com/2011/09/dropboxdiff-chrome-extension.html .
+
+
+Release History:
 
 2014-01-05 update (version 1.0.2.13) - Inline diff implemented.
 
