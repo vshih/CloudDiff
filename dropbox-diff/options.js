@@ -1,8 +1,10 @@
 
-function populate_examples() {
-	var appVersion = navigator.appVersion;
+'use strict';
 
-	var eg;
+function populateExamples() {
+	let appVersion = navigator.appVersion;
+
+	let eg;
 
 	if (appVersion.indexOf('Mac') != -1) {
 		eg = [
@@ -29,17 +31,17 @@ function populate_examples() {
 
 
 // Read from localStorage.
-function restore_options() {
+function restoreOptions() {
 	cmd.value = localStorage.cmd || '';
 }
 
 
-function save_options() {
+function saveOptions() {
 	localStorage.cmd = cmd.value;
 
 	// Show feedback.
 	saved.className = 'show';
-	setTimeout(function () { saved.className = '' }, 1200);
+	setTimeout(() => { saved.className = '' }, 1200);
 
 	// If there is a queued request, use that.
 	chrome.runtime.sendMessage({use_last: true});
@@ -47,7 +49,7 @@ function save_options() {
 
 
 // Test run.
-function test_config() {
+function testConfig() {
 	// Ignore if no command is configured yet.
 	if (document.getElementById('cmd').value.replace(/\s+/g, '').length === 0) return;
 
@@ -59,10 +61,10 @@ function test_config() {
 		return s;
 	}
 
-	var now = new Date();
-	var timestamp = pad2(now.getHours()) + pad2(now.getMinutes()) + pad2(now.getSeconds());
+	let now = new Date();
+	let timestamp = pad2(now.getHours()) + pad2(now.getMinutes()) + pad2(now.getSeconds());
 
-	var content =
+	let content =
 		'Lorem ipsum dolor sit amet,\n' +
 		'consectetur adipisicing elit,\n' +
 		'sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.\n' +
@@ -88,12 +90,12 @@ function test_config() {
 					'(This line was added.)\n'
 			}
 		},
-		diff_response_handler
+		diffResponseHandler
 	);
 }
 
 
-function diff_response_handler(response) {
+function diffResponseHandler(response) {
 	if (response) {
 		alert(
 			'DropboxDiff failed with\n\n' +
@@ -105,16 +107,16 @@ function diff_response_handler(response) {
 
 
 function init() {
-	populate_examples();
-	restore_options();
+	populateExamples();
+	restoreOptions();
 
 	// Set up change handler.
-	var inputs = [ cmd ];
+	let inputs = [ cmd ];
 
-	for (var i in inputs) { inputs[i].onchange = save_options }
+	for (let i in inputs) { inputs[i].onchange = saveOptions }
 
 	// Test button.
-	document.getElementById('config-test').onclick = test_config;
+	document.getElementById('config-test').onclick = testConfig;
 }
 
 

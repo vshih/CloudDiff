@@ -150,14 +150,11 @@ function initBookmarksMounted() {
 
 
 // Insert diff buttons and handlers.
-// TODO reenable external diff button when implemented.
 function injectDiffButtons() {
 	$('#inner-page-header').prepend(`
 		<div style="display: inline-block; margin-left: 189px">
-<!--
 			<button id="exdiff" class="diff-button freshbutton-lightblue" disabled>Diff</button>
- -->
-			<button id="indiff" class="diff-button freshbutton-lightblue" disabled>Inline Diff</button>
+			<button id="indiff" class="diff-button freshbutton-lightblue" disabled>Inline</button>
 		</div>
 	`);
 
@@ -301,12 +298,17 @@ function diffOnClick(in_or_ex) {
 				}
 			};
 
+			// Even though the interaction is non-modal (e.g. the user can browse to the page again and trigger another diff),
+			// give at least some indication that we're doing something by changing the cursor to a spinner.
 			$BODY.addClass('progress');
-			let cleanup = () => { $BODY.removeClass('progress') };
+			let cleanup = () => {
+				$BODY.removeClass('progress');
+			};
 
-			let tries = 3;
+			// Seems like this is more reliable now; try only once.
+			let tries = 1;
 
-			let callback = (response) => {
+			let response_callback = (response) => {
 				switch (response) {
 					case '':
 						// Success.
@@ -319,7 +321,7 @@ function diffOnClick(in_or_ex) {
 						// what seems like a Chrome bug.
 						--tries;
 						if (tries) {
-							setTimeout(() => { chrome.runtime.sendMessage(ex_data, callback) }, 500);
+							setTimeout(() => { chrome.runtime.sendMessage(ex_data, response_callback) }, 500);
 							break;
 						}
 						// else fall through.
@@ -328,7 +330,7 @@ function diffOnClick(in_or_ex) {
 						// Maybe a plugin failure; display it.
 						alert(
 							'DropboxDiff failed with\n\n' +
-							response + '\n\n' +
+							JSON.stringify(response) + '\n\n' +
 							'The JavaScript console of DropboxDiff\'s "background.html" page may have more information.'
 						);
 						cleanup();
@@ -336,7 +338,7 @@ function diffOnClick(in_or_ex) {
 				}
 			};
 
-			chrome.runtime.sendMessage(ex_data, callback);
+			chrome.runtime.sendMessage(ex_data, response_callback);
 		}
 	});
 }

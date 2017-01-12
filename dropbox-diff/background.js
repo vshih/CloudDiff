@@ -1,13 +1,15 @@
 
+// TODO is a background page needed anymore?
+
+'use strict';
+
 // Remember last request if configuration is still needed.
-var LAST_REQUEST;
+let LAST_REQUEST;
 
 function init() {
-	diff_plugin.debug = 1;
-
 	// Set up request listener.
-	chrome.runtime.onMessage.addListener(function (request, sender, send_response) {
-		var cmd = localStorage.cmd;
+	chrome.runtime.onMessage.addListener((request, sender, send_response) => {
+		let cmd = localStorage.cmd;
 
 		if (!cmd) {
 			// Trigger the options page.
@@ -22,18 +24,23 @@ function init() {
 			LAST_REQUEST = null;
 		}
 
-		send_response(
-			diff_plugin.diff(
-				localStorage.cmd,
-				request.left.name,
-				request.left.text,
-				request.right.name,
-				request.right.text
-			)
+		chrome.runtime.sendNativeMessage(
+			'com.vicshih.dropboxdiff',
+			{
+				cmd: cmd,
+				left: request.left,
+				right: request.right
+			},
+			(response) => {
+				console.log(response);
+				send_response('');
+			}
 		);
 
 		// We must return true in order to send a response after the listener returns.
 		return true;
 	});
 }
+
+init();
 
