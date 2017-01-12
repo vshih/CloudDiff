@@ -20,7 +20,8 @@ function init() {
 
 		if (request.use_last && LAST_REQUEST) {
 			request				= LAST_REQUEST.request;
-			send_response = LAST_REQUEST.send_response;
+			send_response	= LAST_REQUEST.send_response;
+
 			LAST_REQUEST = null;
 		}
 
@@ -32,7 +33,7 @@ function init() {
 				right: request.right
 			},
 			(response) => {
-				console.log(response);
+				console.log(response ? response : chrome.runtime.lastError);
 				send_response('');
 			}
 		);
