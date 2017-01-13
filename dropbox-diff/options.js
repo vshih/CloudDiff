@@ -22,7 +22,7 @@ function populateExamples() {
 		eg = [
 			'"C:\\Program Files\\TortoiseSVN\\bin\\TortoiseMerge.exe"',
 			'"C:\\Program Files (x86)\\KDiff3\\kdiff3.exe"',
-			'bash -c \'"$HOME/bin/tkdiff" $1 $2\''
+			`bash -c '"$HOME/bin/tkdiff" $1 $2'`
 		];
 	}
 
@@ -32,12 +32,12 @@ function populateExamples() {
 
 // Read from localStorage.
 function restoreOptions() {
-	cmd.value = localStorage.cmd || '';
+	window.cmd.value = localStorage.cmd || '';
 }
 
 
 function saveOptions() {
-	localStorage.cmd = cmd.value;
+	localStorage.cmd = window.cmd.value;
 
 	// Show feedback.
 	saved.className = 'show';
@@ -51,7 +51,7 @@ function saveOptions() {
 // Test run.
 function testConfig() {
 	// Ignore if no command is configured yet.
-	if (document.getElementById('cmd').value.replace(/\s+/g, '').length === 0) return;
+	if (window.cmd.value.replace(/\s+/g, '').length === 0) return;
 
 
 	// Generate a timestamp to make each test file unique.
@@ -65,16 +65,17 @@ function testConfig() {
 	let timestamp = pad2(now.getHours()) + pad2(now.getMinutes()) + pad2(now.getSeconds());
 
 	let content =
-		'Lorem ipsum dolor sit amet,\n' +
-		'consectetur adipisicing elit,\n' +
-		'sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.\n' +
-		'(This line will be modified.)\n' +
-		'Ut enim ad minim veniam,\n' +
-		'quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.\n' +
-		'(This line will be removed.)\n' +
-		'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.\n' +
-		'Excepteur sint occaecat cupidatat non proident,\n' +
-		'sunt in culpa qui officia deserunt mollit anim id est laborum.\n';
+`Lorem ipsum dolor sit amet,
+consectetur adipisicing elit,
+sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+(This line will be modified.)
+Ut enim ad minim veniam,
+quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+(This line will be removed.)
+Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+Excepteur sint occaecat cupidatat non proident,
+sunt in culpa qui officia deserunt mollit anim id est laborum.
+`;
 
 	chrome.extension.sendMessage(
 		{
@@ -111,7 +112,7 @@ function init() {
 	restoreOptions();
 
 	// Set up change handler.
-	let inputs = [ cmd ];
+	let inputs = [ window.cmd ];
 
 	for (let i in inputs) { inputs[i].onchange = saveOptions }
 

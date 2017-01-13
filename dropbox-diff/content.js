@@ -260,7 +260,7 @@ function diffOnClick(in_or_ex) {
 	let left_name = computeFileName(files.left.url, files.left.sjid, files.left.changed);
 	let right_name = computeFileName(files.right.url, files.right.sjid, files.right.changed);
 
-	// Retrieve text for both files from cache or ajax.
+	// Retrieve text for both files from cache or AJAX.
 	$.when(
 		getFileText(files.left.url),
 		getFileText(files.right.url)
@@ -298,45 +298,45 @@ function diffOnClick(in_or_ex) {
 				}
 			};
 
-			// Even though the interaction is non-modal (e.g. the user can browse to the page again and trigger another diff),
-			// give at least some indication that we're doing something by changing the cursor to a spinner.
-			$BODY.addClass('progress');
-			let cleanup = () => {
-				$BODY.removeClass('progress');
-			};
+				// Even though the interaction is non-modal (e.g. the user can browse to the page again and trigger another diff),
+				// give at least some indication that we're doing something by changing the cursor to a spinner.
+				$BODY.addClass('progress');
+				let cleanup = () => {
+					$BODY.removeClass('progress');
+				};
 
-			// Seems like this is more reliable now; try only once.
-			let tries = 1;
+				// Seems like this is more reliable now; try only once.
+				let tries = 1;
 
-			let response_callback = (response) => {
+				let response_callback = (response) => {
 				switch (response) {
 					case '':
-						// Success.
-						cleanup();
-						break;
-
-					case null:
-					case undefined:
-						// Probably the event page was inactive; try again after a short delay.  Note that this is a workaround for
-						// what seems like a Chrome bug.
-						--tries;
-						if (tries) {
-							setTimeout(() => { chrome.runtime.sendMessage(ex_data, response_callback) }, 500);
+							// Success.
+							cleanup();
 							break;
-						}
-						// else fall through.
 
-					default:
-						// Maybe a plugin failure; display it.
-						alert(
-							'DropboxDiff failed with\n\n' +
-							JSON.stringify(response) + '\n\n' +
-							'The JavaScript console of DropboxDiff\'s "background.html" page may have more information.'
-						);
-						cleanup();
-						break;
-				}
-			};
+						case null:
+						case undefined:
+							// Probably the event page was inactive; try again after a short delay.  Note that this is a workaround for
+							// what seems like a Chrome bug.
+							--tries;
+							if (tries) {
+							setTimeout(() => { chrome.runtime.sendMessage(ex_data, response_callback) }, 500);
+								break;
+							}
+							// else fall through.
+
+						default:
+							// Maybe a plugin failure; display it.
+							alert(
+								'DropboxDiff failed with\n\n' +
+								JSON.stringify(response) + '\n\n' +
+								'The JavaScript console of DropboxDiff\'s "background.html" page may have more information.'
+							);
+							cleanup();
+							break;
+					}
+				};
 
 			chrome.runtime.sendMessage(ex_data, response_callback);
 		}

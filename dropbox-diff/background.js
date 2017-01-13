@@ -1,10 +1,9 @@
 
-// TODO is a background page needed anymore?
-
 'use strict';
 
 // Remember last request if configuration is still needed.
 let LAST_REQUEST;
+
 
 function init() {
 	// Set up request listener.
@@ -13,7 +12,10 @@ function init() {
 
 		if (!cmd) {
 			// Trigger the options page.
-			LAST_REQUEST = {request: request, send_response: send_response};
+			LAST_REQUEST = {
+				request: request,
+				send_response: send_response
+			};
 			chrome.tabs.create({url: 'options.html'});
 			return send_response('');
 		}
