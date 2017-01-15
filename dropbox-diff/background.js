@@ -1,6 +1,9 @@
 
 'use strict';
 
+// Must match nativeMessagingHostName in bitbucket.org/vshih/dropboxdiff-helper/internal/install/install.go.
+const NATIVE_MESSAGING_HOST_NAME = 'com.vicshih.dropboxdiff.helper';
+
 // Remember last request if configuration is still needed.
 let LAST_REQUEST;
 
@@ -28,7 +31,7 @@ function init() {
 		}
 
 		chrome.runtime.sendNativeMessage(
-			'com.vicshih.dropboxdiff',
+			NATIVE_MESSAGING_HOST_NAME,
 			{
 				cmd: cmd,
 				left: request.left,
