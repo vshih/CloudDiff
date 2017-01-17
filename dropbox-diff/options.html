@@ -1,36 +1,53 @@
 <html>
 <head><title>DropboxDiff Options</title>
-<link rel='stylesheet' type='text/css' href='options.css' />
-<script src='options.js'></script>
+<link rel="stylesheet" type="text/css" href="jquery.alertable.css"/>
+<link rel="stylesheet" type="text/css" href="options.css"/>
+<script src="jquery-1.8.0.min.js"></script>
+<script src="jquery.alertable.min.js"></script>
+<script src="common.js"></script>
+<script src="options.js"></script>
+<base target="_blank">
 </head>
 <body>
-<div id='flash'>
-	<span id='saved'>Saved.</span>
+<div id="flash">
+	<span id="saved">Saved.</span>
 </div>
-<div id='margin'>
-	<img src='128.png' /><br />
+<div id="margin">
+	<img src="128.png" /><br />
 	<h1>DropboxDiff</h1>
-	<a href='http://blog.vicshih.com/2011/09/dropboxdiff-chrome-extension.html'>blog.vicshih.com</a>
-</div>
-<div id='content'>
-	<h3>External Diff Tool</h3>
 	<p>
-		Specify how to run your external diff tool:
+		<a href="http://blog.vicshih.com/2011/09/dropboxdiff-chrome-extension.html">blog.vicshih.com</a>
 	</p>
-	<ul>
-		<li>Install a diff tool, if necessary (<a href="http://kdiff3.sourceforge.net/">kdiff3</a>, for example).
-		<li>Use <code>$1</code> and <code>$2</code> to represent the left and right selected files.
+	<p>
+		<a href="https://flattr.com/submit/auto?fid=m66ove&url=chrome-extension%3A%2F%2Faefdkgcdokdiaoppobphjogcilaaakka%2Foptions.html">
+			<img src="flattr-badge-large.png" alt="Flattr this" title="Flattr this" border="0"></a>
+	</p>
+</div>
+<div id="content">
+	<h3>External Diff Tool</h3>
+	<ol>
+		<li>Download the <a href="https://bitbucket.org/vshih/dropboxdiff-helper">DropboxDiff Helper</a> executable for your operating system:<br>
+			<span id="platforms">
+				<a href="https://bitbucket.org/vshih/dropboxdiff-helper/downloads/dropboxdiff-helper_windows.exe" class="Win32">dropboxdiff-helper_windows.exe</a>
+				<a href="https://bitbucket.org/vshih/dropboxdiff-helper/downloads/dropboxdiff-helper_darwin" class="MacIntel">dropboxdiff-helper_darwin</a>
+				<a href="https://bitbucket.org/vshih/dropboxdiff-helper/downloads/dropboxdiff-helper_linux" class="Linux_i686">dropboxdiff-helper_linux</a>
+			</span>
+			(or <a href="https://bitbucket.org/vshih/dropboxdiff-helper/downloads">others</a>).  Double-click to install.
+		<li>Install a diff tool (<a href="http://kdiff3.sourceforge.net/">kdiff3</a>, for example).
+		<li>Specify the command line to run your diff tool, using the full path if required.  Quote the path if it contains spaces.
+		<li>Optional:  use <code>$1</code> and <code>$2</code> to represent the left and right selected files passed.
 		<ul>
-			<li>If not specified, the file names will be quoted and appended as the first and second parameters to your program.
+			<li>If not given, the file names will be quoted and appended as the first and second parameters to your program.
 		</ul>
-		<li>Specifying the full path of your program may be required.  Quote the path if it contains spaces.
-	</ul>
+	</ol>
 	<h4>Examples:</h4>
-	<ul id='examples'></ul>
+	<ul id="examples"></ul>
 
-	<label for='cmd'>Command:</label>
-	<input type='text' id='cmd' />
-	<button id='config-test'>Test</button>
+	<div id="cmd-box">
+		<label id="cmd-label" for="cmd">Command:</label>
+		<input type="text" id="cmd" />
+		<button id="config-test">Test</button>
+	</div>
 </div>
 </body>
 </html>

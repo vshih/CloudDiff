@@ -1,19 +1,26 @@
 body { background-color: #f0f0f0 }
 * { font-family: Tahoma, Helvetica, Arial }
-code, #examples li { font-family: Courier New }
-p { color: #505050; font-size: 11pt }
+
+#platforms a { display: none }
+body.Win32		#platforms .Win32 { display: inline }
+body.MacIntel	#platforms .MacIntel { display: inline }
+body.Linux_i686	#platforms .Linux_i686 { display: inline }
+
+code, #examples li { font-family: Consolas, Courier New }
+p { color: #505050 }
 h4 { font-weight: normal; margin-bottom: 0 }
+li { line-height: 22pt }
 a { text-decoration: none }
 a:hover { text-decoration: underline }
 
 #flash { text-align: center }
-#saved { visibility: hidden; background-color: yellow; padding: 4px 8px 4px 12px; border-radius: 8px }
+#saved { visibility: hidden; background-color: yellow; padding: 7px 11px 7px 14px; border-radius: 8px }
 #saved.show { visibility: visible }
 
-#margin { padding: 0 30px 0 20px; width: 252px }
+#margin { padding: 0 30px 0 20px; width: 232px }
 #content {
 	position: absolute;
-	left: 253px;
+	left: 233px;
 	top: 20px;
 	padding-left: 25px;
 	border-left: 1px dotted gray;
@@ -22,6 +29,16 @@ a:hover { text-decoration: underline }
 
 .clear { clear: both; padding: 10px }
 
-label { display: inline-block; width: 100px }
+#cmd-box { margin-top: 22px }
 
-#cmd { width: 400px }
+#cmd-label { display: inline-block; width: 100px }
+
+#cmd { width: 550px }
+
+#config-test { padding: 5px 20px; position: relative; top: -2px }
+
+/* Font sizing */
+h3, input { font-size: 13pt }
+p, h4 { font-size: 12pt }
+li, a, label { font-size: 11pt }
+

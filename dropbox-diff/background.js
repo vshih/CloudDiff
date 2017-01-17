@@ -38,8 +38,21 @@ function init() {
 				right: request.right
 			},
 			(response) => {
-				console.log(response ? response : chrome.runtime.lastError);
-				send_response('');
+				if (response) {
+					console.log(response);
+
+					if (response.ExitStatus == 0) {
+						// Success.
+						send_response('');
+					}
+					else {
+						send_response(response.Output);
+					}
+				}
+				else {
+					console.log(chrome.runtime.lastError);
+					send_response(chrome.runtime.lastError.message);
+				}
 			}
 		);
 

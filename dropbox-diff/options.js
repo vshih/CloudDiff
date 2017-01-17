@@ -1,6 +1,15 @@
 
 'use strict';
 
+
+const FLASH_TIMEOUT = 1800;
+
+
+function setPlatform() {
+	document.body.className += ' ' + navigator.platform.replace(/ /g, '_');
+}
+
+
 function populateExamples() {
 	let appVersion = navigator.appVersion;
 
@@ -8,21 +17,22 @@ function populateExamples() {
 
 	if (appVersion.indexOf('Mac') != -1) {
 		eg = [
-			'opendiff',
-			'/usr/local/bin/mvim -d'
+			`opendiff`,
+			`/usr/local/bin/mvim -d`,
 		];
 	}
 	else if (appVersion.indexOf('Linux') != -1) {
 		eg = [
-			'gvim -d',
-			'kdiff3'
+			`gvim -d`,
+			`kdiff3`,
 		];
 	}
 	else {
 		eg = [
-			'"C:\\Program Files\\TortoiseSVN\\bin\\TortoiseMerge.exe"',
-			'"C:\\Program Files (x86)\\KDiff3\\kdiff3.exe"',
-			`bash -c '"$HOME/bin/tkdiff" $1 $2'`
+			`"C:\\Program Files (x86)\\KDiff3\\kdiff3.exe"`,
+			`"C:\\Program Files\\Devart\\Code Compare\\CodeCompare.exe" /W`,
+			`"C:\\Program Files\\TortoiseSVN\\bin\\TortoiseMerge.exe"`,
+			`bash -c '"$HOME/bin/tkdiff" $1 $2'`,
 		];
 	}
 
@@ -40,8 +50,8 @@ function saveOptions() {
 	localStorage.cmd = window.cmd.value;
 
 	// Show feedback.
-	saved.className = 'show';
-	setTimeout(() => { saved.className = '' }, 1200);
+	window.saved.className = 'show';
+	setTimeout(() => { window.saved.className = '' }, FLASH_TIMEOUT);
 
 	// If there is a queued request, use that.
 	chrome.runtime.sendMessage({use_last: true});
@@ -64,7 +74,7 @@ function testConfig() {
 	let now = new Date();
 	let timestamp = pad2(now.getHours()) + pad2(now.getMinutes()) + pad2(now.getSeconds());
 
-	let content =
+	let content_left =
 `Lorem ipsum dolor sit amet,
 consectetur adipisicing elit,
 sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
@@ -76,41 +86,31 @@ Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu 
 Excepteur sint occaecat cupidatat non proident,
 sunt in culpa qui officia deserunt mollit anim id est laborum.
 `;
+	let content_right = content_left
+		.replace(/\(This line will be modified\.\)\n/, '(This line was indeed modified.)\n')
+		.replace(/\(This line will be removed\.\)\n/, '') +
+		'(This line was added.)\n';
+
+	let ex_data = {
+		left: {
+			name: `Left test file ${timestamp}.txt`,
+			text: content_left
+		},
+		right: {
+			name: `Right test file ${timestamp}.txt`,
+			text: content_right
+		}
+	};
+	let tries = 1;
 
 	chrome.extension.sendMessage(
-		{
-			left: {
-				name: 'Left test file ' + timestamp + '.txt',
-				text: content
-			},
-			right: {
-				name: 'Right test file ' + timestamp + '.txt',
-				text: content
-					.replace(/\(This line will be modified\.\)\n/, '(This line was indeed modified.)\n')
-					.replace(/\(This line will be removed\.\)\n/, '') +
-					'(This line was added.)\n'
-			}
-		},
-		diffResponseHandler
+		ex_data,
+		createExDiffResponseHandler(ex_data, tries)
 	);
 }
 
 
-function diffResponseHandler(response) {
-	if (response) {
-		alert(
-			'DropboxDiff failed with\n\n' +
-			response + '\n\n' +
-			'The javascript console of DropboxDiff\'s "background.html" page may have more information.'
-		);
-	}
-}
-
-
-function init() {
-	populateExamples();
-	restoreOptions();
-
+function registerHandlers() {
 	// Set up change handler.
 	let inputs = [ window.cmd ];
 
@@ -118,6 +118,14 @@ function init() {
 
 	// Test button.
 	document.getElementById('config-test').onclick = testConfig;
+}
+
+
+function init() {
+	setPlatform();
+	populateExamples();
+	restoreOptions();
+	registerHandlers();
 }
 
 
