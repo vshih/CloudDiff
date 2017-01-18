@@ -53,7 +53,7 @@ Current Version Release Notes:
 
 Provides two options for comparing different versions of your Dropbox files:  1) a side-by-side diff within your browser, or 2) an external diff tool.  This can be TortoiseMerge, kdiff3, FileMerge, or any tool which can be triggered from a command line.
 
-In the "Previous versions" view of the Dropbox web interface of any file, a column is added which allows you to select two versions to compare.  Click the "Inline Diff" button to view the difference in-browser, or the "Diff" button to trigger your configured diff tool.
+In the "Version history" view of the Dropbox web interface of any file, a column is added which allows you to select two versions to compare.  Click the "Inline Diff" button to view the difference in-browser, or the "Diff" button to trigger your configured diff tool.
 
 Supports Windows, Mac, and Linux as far as I know, though I can't be sure every possible configuration is covered.
 
