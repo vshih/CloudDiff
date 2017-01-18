@@ -48,12 +48,12 @@ Detailed description
 
 Current Version Release Notes:
 
-2016-01-05 update (version 1.0.2.14) - Inline diff restored; external diff support coming soon.  Removed NPAPI requirement, since it is no longer supported.
+2017-01-18 update (version 1.0.2.15) - External diff restored; requires a separate "DropboxDiff Helper" installation.
 
 
-Provides two options for comparing different versions of your Dropbox files:  1) a side-by-side diff within your browser, or 2) an external diff tool (to be restored soon).  This can be TortoiseMerge, kdiff3, FileMerge, or any tool which can be triggered from a command line.
+Provides two options for comparing different versions of your Dropbox files:  1) a side-by-side diff within your browser, or 2) an external diff tool.  This can be TortoiseMerge, kdiff3, FileMerge, or any tool which can be triggered from a command line.
 
-In the "Previous versions" view of the Dropbox web interface of any file, a column is added which allows you to select two versions to compare.  Click the "Inline Diff" button to view the difference in-browser, or the Diff button to trigger your configured diff tool.
+In the "Previous versions" view of the Dropbox web interface of any file, a column is added which allows you to select two versions to compare.  Click the "Inline Diff" button to view the difference in-browser, or the "Diff" button to trigger your configured diff tool.
 
 Supports Windows, Mac, and Linux as far as I know, though I can't be sure every possible configuration is covered.
 
@@ -61,6 +61,8 @@ Please let me know if you run into any issues at http://blog.vicshih.com/2011/09
 
 
 Release History:
+
+2017-01-05 update (version 1.0.2.14) - Inline diff restored; external diff support coming soon.  Removed NPAPI requirement, since it is no longer supported.
 
 2014-01-05 update (version 1.0.2.13) - Inline diff implemented.
 
