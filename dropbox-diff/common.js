@@ -7,7 +7,6 @@ function createExDiffResponseHandler(ex_data, tries, callback) {
 		switch (response) {
 		case '':
 			// Success.
-			cleanup();
 			break;
 
 		case null:

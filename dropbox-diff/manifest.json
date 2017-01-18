@@ -2,7 +2,7 @@
 	"name": "DropboxDiff",
 	"short_name": "DropboxDiff",
 	"description": "Compare versions of your Dropbox files in-browser or with your configured diff tool. Trigger from any \"Previous versions\" page.",
-	"version": "1.0.2.14",
+	"version": "1.0.2.15",
 
 	"manifest_version": 2,
 	"background": {
