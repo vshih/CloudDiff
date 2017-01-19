@@ -29,9 +29,18 @@
 		<li>Download the <a href="https://bitbucket.org/vshih/dropboxdiff-helper">DropboxDiff Helper</a> executable for your operating system:<br>
 			<a href="https://bitbucket.org/vshih/dropboxdiff-helper/downloads/dropboxdiff-helper_windows.exe" class="platform Win32">dropboxdiff-helper_windows.exe</a>
 			<a href="https://bitbucket.org/vshih/dropboxdiff-helper/downloads/dropboxdiff-helper_darwin" class="platform MacIntel">dropboxdiff-helper_darwin</a>
-			<a href="https://bitbucket.org/vshih/dropboxdiff-helper/downloads/dropboxdiff-helper_linux" class="platform Linux_i686">dropboxdiff-helper_linux</a>
+			<a href="https://bitbucket.org/vshih/dropboxdiff-helper/downloads/dropboxdiff-helper_linux" class="platform Linux_x86_64">dropboxdiff-helper_linux</a>
+
 			(or <a href="https://bitbucket.org/vshih/dropboxdiff-helper/downloads">others</a>).  Double-click to install.
-			<span class="platform Win32">To bypass Windows SmartScreen, click the "More Info" text, then the "Run Anyway" button.</span>
+
+			<ul>
+				<li class="platform Win32">
+					To bypass Windows SmartScreen, click the "More Info" text, then the "Run Anyway" button.
+				</li>
+				<li class="platform MacIntel Linux_x86_64">
+					Follow the instructions at <a href="https://bitbucket.org/vshih/dropboxdiff-helper">DropboxDiff Helper</a> to install.
+				</li>
+			</ul>
 		<li>Install a diff tool (<a href="http://kdiff3.sourceforge.net/">kdiff3</a>, for example).
 		<li>Specify the command line to run your diff tool, using the full path if required.  Quote the path if it contains spaces.
 		<li>Optional:  use <code>$1</code> and <code>$2</code> to represent the left and right selected files passed.

@@ -2,9 +2,12 @@ body { background-color: #f0f0f0 }
 * { font-family: Tahoma, Helvetica, Arial }
 
 .platform { display: none }
-body.Win32		.platform.Win32 { display: inline }
-body.MacIntel	.platform.MacIntel { display: inline }
-body.Linux_i686	.platform.Linux_i686 { display: inline }
+body.Win32			  .platform.Win32 { display: inline }
+body.Win32			li.platform.Win32 { display: list-item }
+body.MacIntel		  .platform.MacIntel { display: inline }
+body.MacIntel		li.platform.MacIntel { display: list-item }
+body.Linux_x86_64	  .platform.Linux_x86_64 { display: inline }
+body.Linux_x86_64	li.platform.Linux_x86_64 { display: list-item }
 
 code, #examples li { font-family: Consolas, Courier New }
 p { color: #505050 }
