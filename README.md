@@ -4,6 +4,8 @@
 
 ## Current Version Release Notes: ##
 
+2017-01-21 update (version 1.0.2.16) - Support "Load older versions".
+
 2017-01-18 update (version 1.0.2.15) - External diff restored; requires a separate "DropboxDiff Helper" installation.
 
 

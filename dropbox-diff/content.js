@@ -346,8 +346,8 @@ function injectScript(script) {
 
 
 function onNewRevisionsJson(revisions) {
-	// Example direct_blockserver_link value:
-	//	https://www.dropbox.com/pri/get/{path}/{file}.{ext}?_subject_uid=1252292&w=AAA...
+	// Example direct_blockserver_link values:
+	//	//dl-web.dropbox.com/get/{path}/{file}.{ext}?_subject_uid=1252292&revision_id=AsKy...&w=AAD...
 	revisions.forEach(revision => {
 		REV_MAP[revision.id] = revision.preview_info.direct_blockserver_link;
 	});
@@ -361,6 +361,7 @@ function addNewRevisionsAjaxListener(callback) {
 
 function onNewRevisionsMarkup(mutations) {
 	injectRadioButtons();
+	onceNewContentListener($PAGE_CONTENT[0], onNewRevisionsMarkup);
 }
 
 
