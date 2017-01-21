@@ -85,6 +85,7 @@ Please let me know if you run into any issues at http://blog.vicshih.com/2011/09
 - https://github.com/claviska/jquery-alertable
 - http://stackoverflow.com/questions/9602022/chrome-extension-retrieving-gmails-original-message
 - http://www.techtalkz.com/microsoft-office-word/172251-invoking-compare-merge-command-line.html
+- http://daviddeley.com/autohotkey/parameters/parameters.htm#WIN
 - http://ss64.com/nt/cmd.html
 - http://ss64.com/nt/start.html
 - http://www.iconarchive.com/show/aesthetica-2-icons-by-dryicons/search-icon.html
