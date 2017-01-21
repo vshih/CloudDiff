@@ -15,6 +15,12 @@
 	margin-right: 521px;
 }
 
+/* Added radio buttons' container. */
+.diff-sel {
+	text-align: center;
+	width: 65px;
+}
+
 /* Differentiate added rows. */
 .tr-added {
 	background-color: #eee;

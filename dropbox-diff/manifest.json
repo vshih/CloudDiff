@@ -2,7 +2,7 @@
 	"name": "DropboxDiff",
 	"short_name": "DropboxDiff",
 	"description": "Compare versions of your Dropbox files in-browser or with your configured diff tool. Trigger from any \"Version history\" page.",
-	"version": "1.0.2.15",
+	"version": "1.0.2.16",
 
 	"manifest_version": 2,
 	"background": {
@@ -14,14 +14,14 @@
 			"css": [
 				"diffview.css",
 				"jquery.alertable.css",
-				"styles.css"
+				"content.css"
 			],
 			"js": [
 				"jquery-1.8.0.min.js",
 				"jquery.alertable.min.js",
 				"difflib.js",
 				"diffview.js",
-				"common.js",
+				"ex-handler.js",
 				"content.js"
 			],
 			"matches": [ "https://www.dropbox.com/history/*" ],
@@ -29,7 +29,8 @@
 		}
 	],
 	"web_accessible_resources": [
-		"icon_spacer-vflN3BYt2.gif"
+		"icon_spacer-vflN3BYt2.gif",
+		"content-inject.js"
 	],
 	"content_security_policy": "default-src 'self' https://*.dropbox.com",
 	"icons": {

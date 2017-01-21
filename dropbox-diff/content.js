@@ -1,9 +1,6 @@
 
 'use strict';
 
-// jQuery alias.
-(($) => {
-
 
 // ===== Globals/bookmarks.
 
@@ -24,7 +21,7 @@ let $FILE_PREVIEW_MODAL;
 let PREVIEW_TOP_PX;
 
 // Extracted revision information, keyed by sjid.
-let REV_MAP;
+let REV_MAP = {};
 
 // Cache for retrieved file text.
 let TEXT_CACHE = {};
@@ -40,15 +37,14 @@ function initBookmarks() {
 }
 
 
-// Register a callback to fire when React is done mounting.
+// Register a callback to fire when React is done rendering/updating.
+// Disconnect immediately, since in our case we do our own mutating subsequently.
 // There's probably a proper way to do this using onComponentDidMount() but I don't know it.
-function registerReactReadyListener(target, callback) {
+function onceNewContentListener(target, callback) {
 	let observer = new MutationObserver(mutations => {
-		// A single event seems like enough for the whole DOM to be complete.
-
-		callback();
-
 		observer.disconnect();
+
+		callback(mutations);
 	});
 
 	observer.observe(target, {
@@ -110,37 +106,30 @@ function injectInlineDiffMarkup() {
 
 
 // Revision info is stored as a JSON object within a script tag.
-// TODO Not sure what needs to happen when the user clicks "Load older versions".
-function extractRevInfo() {
+function initRevInfo() {
 	// Assumptions:
 	//	- JSON is not minified.
 	//	- "revisions" array contains no "]" embedded characters.
-	let re = /"revisions": (\[[^\]]+\])/;
+	const find_revs_re = /"revisions": (\[[^\]]+\])/;
 
 	let json = null;
 
-	$.each(document.scripts, (i, script) => {
-		let match = script.innerText.match(re);
+	// The "revisions" object is usually close to the end; search in reverse order.
+	for (let i = document.scripts.length - 1; i >= 0; --i) {
+		let match = document.scripts[i].innerText.match(find_revs_re);
 
 		if (match) {
 			json = match[1];
-			return false;
+			break;
 		}
-	});
+	}
 
 	if (!json) {
 		return window.alert('DropboxDiff failed to extract revision information.');
 	}
 
 	let revisions = JSON.parse(json);
-
-	REV_MAP = {};
-
-	// Example direct_blockserver_link value:
-	//	https://www.dropbox.com/pri/get/{path}/{file}.{ext}?_subject_uid=1252292&w=AAA...
-	revisions.forEach(r => {
-		REV_MAP[r.id] = r.preview_info.direct_blockserver_link;
-	});
+	onNewRevisionsJson(revisions);
 }
 
 
@@ -163,13 +152,23 @@ function injectDiffButtons() {
 	$('#exdiff').click(() => { diffOnClick('ex') });
 }
 
+
 function injectRadioButtons() {
-	$REV_DIV.find('.file-revisions__row_fake_wrapper_col').prepend(`
-		<div class="file-revisions__row__col diff-sel" style="text-align: center; width: 65px">
-			<input type="radio" name="diff-l" title="left side"/>
-			<input type="radio" name="diff-r" title="right side"/>
-		</div>
-	`);
+	const has_diff_buttons_re = /\bdiff-sel\b/;
+
+	// Start from the end and work backwards, for the appended case.
+	$($REV_DIV.find('.file-revisions__row_fake_wrapper_col').get().reverse()).each((i, element) => {
+		if (has_diff_buttons_re.test(element.childNodes[0].className)) {
+			return false;
+		}
+
+		$(element).prepend(`
+			<div class="file-revisions__row__col diff-sel">
+				<input type="radio" name="diff-l" title="left side"/>
+				<input type="radio" name="diff-r" title="right side"/>
+			</div>
+		`);
+	});
 }
 
 
@@ -335,27 +334,57 @@ function windowOnResize() {
 }
 
 
+// From http://stackoverflow.com/questions/9515704/building-a-chrome-extension-inject-code-in-a-page-using-a-content-script/9517879#9517879, method 1.
+function injectScript(script) {
+	let scriptElement = document.createElement('script');
+	scriptElement.src = chrome.extension.getURL(script);
+	scriptElement.onload = function () {
+		this.remove();
+	};
+	(document.head || document.documentElement).appendChild(scriptElement);
+}
+
+
+function onNewRevisionsJson(revisions) {
+	// Example direct_blockserver_link value:
+	//	https://www.dropbox.com/pri/get/{path}/{file}.{ext}?_subject_uid=1252292&w=AAA...
+	revisions.forEach(revision => {
+		REV_MAP[revision.id] = revision.preview_info.direct_blockserver_link;
+	});
+}
+
+
+function addNewRevisionsAjaxListener(callback) {
+	document.addEventListener('com.vicshih.dropboxdiff.new-revisions-json', callback);
+}
+
+
+function onNewRevisionsMarkup(mutations) {
+	injectRadioButtons();
+}
+
+
 // ===== Main.
 
 
 // Stuff that can be initialized on document.ready.
 $(() => {
 	initBookmarks();
-
-	registerReactReadyListener($PAGE_CONTENT[0], onReactReady);
+	onceNewContentListener($PAGE_CONTENT[0], onReactReady);
 	injectInlineDiffMarkup();
-	extractRevInfo();
+	initRevInfo();
+	addNewRevisionsAjaxListener(onNewRevisionsJson);
 });
 
 
 // Stuff that must be performed after React components are loaded.
 function onReactReady() {
 	initBookmarksMounted();
-
 	injectDiffButtons();
 	injectRadioButtons();
+	injectScript('content-inject.js');
+
+	// Listen for any new markup.
+	onceNewContentListener($PAGE_CONTENT[0], onNewRevisionsMarkup);
 }
-
-
-})(jQuery);
 
