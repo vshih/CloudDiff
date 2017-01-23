@@ -1,10 +1,17 @@
 {
-	"name": "DropboxDiff",
-	"short_name": "DropboxDiff",
-	"description": "Compare versions of your Dropbox files in-browser or with your configured diff tool. Trigger from any \"Version history\" page.",
-	"version": "1.0.2.16",
-
 	"manifest_version": 2,
+	"name": "DropboxDiff",
+	"version": "1.0.2.17",
+
+	"default_locale": "en",
+	"description": "Compare versions of your Dropbox files in-browser or with your configured diff tool. Trigger from any \"Version history\" page.",
+	"icons": {
+		"16": "16.png",
+		"48": "48.png",
+		"128": "128.png"
+	},
+
+	"author": "Victor Shih <victor.shih@gmail.com>",
 	"background": {
 		"page": "background.html",
 		"persistent": false
@@ -12,8 +19,8 @@
 	"content_scripts": [
 		{
 			"css": [
-				"diffview.css",
 				"jquery.alertable.css",
+				"diffview.css",
 				"content.css"
 			],
 			"js": [
@@ -24,24 +31,23 @@
 				"ex-handler.js",
 				"content.js"
 			],
-			"matches": [ "https://www.dropbox.com/history/*" ],
+			"matches": [
+				"https://www.dropbox.com/history/*"
+			],
 			"run_at": "document_end"
 		}
 	],
-	"web_accessible_resources": [
-		"icon_spacer-vflN3BYt2.gif",
-		"content-inject.js"
-	],
 	"content_security_policy": "default-src 'self' https://*.dropbox.com",
-	"icons": {
-		"128": "128.png",
-		"16": "16.png",
-		"48": "48.png"
-	},
 	"minimum_chrome_version": "22.0.0.0",
+	"offline_enabled": false,
 	"options_page": "options.html",
 	"permissions": [
 		"https://*.dropbox.com/*",
 		"nativeMessaging"
+	],
+	"short_name": "DropboxDiff",
+	"web_accessible_resources": [
+		"content-inject.js",
+		"icon_spacer-vflN3BYt2.gif"
 	]
 }

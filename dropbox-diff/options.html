@@ -13,7 +13,7 @@
 	<span id="saved">Saved.</span>
 </div>
 <div id="margin">
-	<img src="128.png" /><br />
+	<img src="128.png"/><br/>
 	<h1>DropboxDiff</h1>
 	<p>
 		<a href="http://blog.vicshih.com/2011/09/dropboxdiff-chrome-extension.html">blog.vicshih.com</a>
@@ -26,34 +26,31 @@
 <div id="content">
 	<h3>External Diff Tool</h3>
 	<ol>
-		<li>Download the <a href="https://bitbucket.org/vshih/dropboxdiff-helper">DropboxDiff Helper</a> executable for your operating system:<br>
-
-			<a href="https://bitbucket.org/vshih/dropboxdiff-helper/downloads/dropboxdiff-helper_windows.exe" class="platform Win32">dropboxdiff-helper_windows.exe</a>
-			<a href="https://bitbucket.org/vshih/dropboxdiff-helper/downloads/dropboxdiff-helper_darwin" class="platform MacIntel">dropboxdiff-helper_darwin</a>
-			<a href="https://bitbucket.org/vshih/dropboxdiff-helper/downloads/dropboxdiff-helper_linux" class="platform Linux_x86_64">dropboxdiff-helper_linux</a>
-
-			(or <a href="https://bitbucket.org/vshih/dropboxdiff-helper/downloads">others</a>).
-
-			<span class="platform Win32">
-				To bypass Windows SmartScreen, click the "More Info" text, then the "Run Anyway" button.
-			</span>
-			<span class="platform MacIntel Linux_x86_64">
-				Follow the instructions at <a href="https://bitbucket.org/vshih/dropboxdiff-helper">DropboxDiff Helper</a> to install.
-			</span>
+		<li>Install the <a href="https://bitbucket.org/vshih/dropboxdiff-helper">DropboxDiff Helper</a>:
+			<ul class="platform Win32">
+				<li>Download <a href="https://bitbucket.org/vshih/dropboxdiff-helper/downloads/dropboxdiff-helper_windows.exe">dropboxdiff-helper_windows.exe</a>.
+				<li>To bypass Windows SmartScreen, click the <i>More Info</i> link, then the <i>Run Anyway</i> button.
+			</ul>
+			<ul class="platform MacIntel Linux_x86_64">
+				<li>Open a Terminal window.
+				<li>Run the following command:  <code>curl -LO https://bitbucket.org/vshih/dropboxdiff-helper/downloads/install.sh | sh</code>
+			</ul>
 
 		<li>Install a diff tool (<a href="http://kdiff3.sourceforge.net/">kdiff3</a>, for example).
+
 		<li>Specify the command line to run your diff tool, using the full path if required.  Quote the path if it contains spaces.
+
 		<li>Optional:  use <code>$1</code> and <code>$2</code> to represent the left and right selected files passed.
-		<ul>
-			<li>If not given, the file names will be quoted and appended as the first and second parameters to your program.
-		</ul>
+			<ul>
+				<li>If not given, the file names will be quoted and appended as the first and second parameters to your program.
+			</ul>
 	</ol>
 	<h4>Examples:</h4>
 	<ul id="examples"></ul>
 
 	<div id="cmd-box">
 		<label id="cmd-label" for="cmd">Command:</label>
-		<input type="text" id="cmd" />
+		<input type="text" id="cmd"/>
 		<button id="config-test">Test</button>
 	</div>
 </div>

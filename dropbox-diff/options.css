@@ -4,9 +4,13 @@ body { background-color: #f0f0f0 }
 .platform { display: none }
 body.Win32			.platform.Win32,
 body.MacIntel		.platform.MacIntel,
-body.Linux_x86_64	.platform.Linux_x86_64 { display: inline }
+body.Linux_x86_64	.platform.Linux_x86_64 { display: block }
 
-code, #examples li { font-family: Consolas, Courier New }
+code		{ cursor: pointer; padding: 5px 8px }
+/* Use <i> for identifiers. */
+i			{ font-style: normal; padding: 3px 6px }
+code, i		{ background-color: #e0e0e0; border-radius: 6px; font-family: Consolas, Courier New }
+
 p { color: #505050 }
 h4 { font-weight: normal; margin-bottom: 0 }
 li { line-height: 22pt }
@@ -29,6 +33,8 @@ a:hover { text-decoration: underline }
 
 .clear { clear: both; padding: 10px }
 
+#examples code { border-radius: 3px; display: block; margin: 8px; padding: 1px 6px }
+
 #cmd-box { margin-top: 22px }
 
 #cmd-label { display: inline-block; width: 100px }
@@ -41,4 +47,5 @@ a:hover { text-decoration: underline }
 h3, input { font-size: 13pt }
 p, h4 { font-size: 12pt }
 li, a, label { font-size: 11pt }
+i { font-size: 10pt }
 

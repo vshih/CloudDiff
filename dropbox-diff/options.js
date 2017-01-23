@@ -36,7 +36,7 @@ function populateExamples() {
 		];
 	}
 
-	examples.innerHTML = '<li>' + eg.join('<li>');
+	examples.innerHTML = eg.map(e => `<li><code>${e}</code>`).join('');
 }
 
 
@@ -55,6 +55,20 @@ function saveOptions() {
 
 	// If there is a queued request, use that.
 	chrome.runtime.sendMessage({use_last: true});
+}
+
+
+// For code blocks, select all block text on click.
+function selectCodeBlockOnClick(event) {
+	let target = event.target;
+	if (target.tagName == 'CODE') {
+		let selection = window.getSelection();
+		if (selection.rangeCount > 0) { selection.removeAllRanges(); }
+
+		let range = document.createRange();
+		range.selectNode(target);
+		selection.addRange(range);
+	}
 }
 
 
@@ -110,11 +124,11 @@ sunt in culpa qui officia deserunt mollit anim id est laborum.
 }
 
 
-function registerHandlers() {
-	// Set up change handler.
-	let inputs = [ window.cmd ];
+function registerListeners() {
+	document.body.addEventListener('click', selectCodeBlockOnClick);
 
-	for (let i in inputs) { inputs[i].onchange = saveOptions }
+	// Set up change handler.
+	window.cmd.onchange = saveOptions;
 
 	// Test button.
 	document.getElementById('config-test').onclick = testConfig;
@@ -125,7 +139,7 @@ function init() {
 	setPlatform();
 	populateExamples();
 	restoreOptions();
-	registerHandlers();
+	registerListeners();
 }
 
 
