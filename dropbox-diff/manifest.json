@@ -3,7 +3,6 @@
 	"name": "DropboxDiff",
 	"version": "1.0.2.17",
 
-	"default_locale": "en",
 	"description": "Compare versions of your Dropbox files in-browser or with your configured diff tool. Trigger from any \"Version history\" page.",
 	"icons": {
 		"16": "16.png",
