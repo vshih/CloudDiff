@@ -154,15 +154,13 @@ function injectDiffButtons() {
 
 
 function injectRadioButtons() {
-	const has_diff_buttons_re = /\bdiff-sel\b/;
-
 	// Start from the end and work backwards, for the appended case.
 	$($REV_DIV.find('.file-revisions__row_fake_wrapper_col').get().reverse()).each((i, element) => {
-		if (has_diff_buttons_re.test(element.childNodes[0].className)) {
-			return false;
-		}
+		let $element = $(element);
 
-		$(element).prepend(`
+		if ($element.has('.diff-sel').length) { return false; }
+
+		$element.prepend(`
 			<div class="file-revisions__row__col diff-sel">
 				<input type="radio" name="diff-l" title="left side"/>
 				<input type="radio" name="diff-r" title="right side"/>
