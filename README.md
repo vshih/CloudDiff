@@ -15,7 +15,7 @@ Provides two options for comparing different versions of your Dropbox files:  1)
 
 In the "Version history" view of the Dropbox web interface of any file, a column is added which allows you to select two versions to compare.  Click the "Inline Diff" button to view the difference in-browser, or the "Diff" button to trigger your configured diff tool.
 
-Supports Windows, Mac, and Linux as far as I know, though I can't be sure every possible configuration is covered.
+Supports Windows, Mac, and Linux as far as I know, though I can't be sure every possible configuration is covered.  Note that the combined file-size limit in any comparison is 4GB.
 
 Please let me know if you run into any issues at http://blog.vicshih.com/2011/09/dropboxdiff-chrome-extension.html .
 
