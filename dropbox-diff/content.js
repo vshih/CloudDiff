@@ -353,7 +353,7 @@ function onNewRevisionsJson(revisions) {
 
 
 function addNewRevisionsAjaxListener(callback) {
-	document.addEventListener('com.vicshih.dropboxdiff.new-revisions-json', callback);
+	document.addEventListener('com.vicshih.dropboxdiff.new-revisions-json', customEvent => callback(customEvent.detail));
 }
 
 

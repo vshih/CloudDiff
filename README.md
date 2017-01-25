@@ -4,7 +4,7 @@
 
 ## Current Version Release Notes: ##
 
-2017-01-22 update (version 1.0.2.17-18) - Updated installation instructions for Mac/Linux; bug fixes.
+2017-01-24 update (versions 1.0.2.17-19) - Updated installation instructions for Mac/Linux; bug fixes.
 
 2017-01-21 update (version 1.0.2.16) - Support "Load older versions".
 
