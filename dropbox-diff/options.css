@@ -37,7 +37,8 @@ a:hover { text-decoration: underline }
 
 #cmd-box { margin-top: 22px }
 
-#cmd-label { display: inline-block; width: 100px }
+#cmd-label, #ignore-margin { display: inline-block; width: 100px }
+#ignore-box { display: inline-block; margin-top: 8px }
 
 #cmd { width: 550px }
 

@@ -46,7 +46,13 @@ function init() {
 						send_response('');
 					}
 					else {
-						send_response(response.Output);
+						if (localStorage.ignoreExit) {
+							console.log("Non-zero exit status ignored.");
+							send_response('');
+						}
+						else {
+							send_response(response.Output);
+						}
 					}
 				}
 				else {

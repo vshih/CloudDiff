@@ -43,11 +43,13 @@ function populateExamples() {
 // Read from localStorage.
 function restoreOptions() {
 	window.cmd.value = localStorage.cmd || '';
+	window['ignore-exit'].checked = localStorage.ignoreExit;
 }
 
 
 function saveOptions() {
 	localStorage.cmd = window.cmd.value;
+	localStorage.ignoreExit = window['ignore-exit'].checked ? 'on' : '';
 
 	// Show feedback.
 	window.saved.className = 'show';
@@ -127,8 +129,8 @@ sunt in culpa qui officia deserunt mollit anim id est laborum.
 function registerListeners() {
 	document.body.addEventListener('click', selectCodeBlockOnClick);
 
-	// Set up change handler.
-	window.cmd.onchange = saveOptions;
+	// Set up change handlers.
+	window.cmd.onchange = window['ignore-exit'].onchange = saveOptions;
 
 	// Test button.
 	document.getElementById('config-test').onclick = testConfig;

@@ -1,26 +1,30 @@
 
 # README #
 
+Compare versions of your Dropbox files in-browser or with your configured diff tool. Trigger from any "Version history" page.
+
 
 ## Current Version Release Notes: ##
 
-2017-01-24 update (versions 1.0.2.17-19) - Updated installation instructions for Mac/Linux; bug fixes.
+2017-01-26 update (version 1.0.2.20) - Implement "Ignore exit status" option.
+
+2017-01-22 update (versions 1.0.2.17-19) - Update installation instructions for Mac/Linux; bug fixes.
 
 2017-01-21 update (version 1.0.2.16) - Support "Load older versions".
 
-2017-01-18 update (version 1.0.2.15) - External diff restored; requires a separate "DropboxDiff Helper" installation.
 
+Provides two options for comparing different versions of your Dropbox files:  1) an external diff tool, or 2) a side-by-side diff within your browser.  This can be TortoiseMerge, KDiff3, FileMerge, or any tool which can be triggered from the command line.
 
-Provides two options for comparing different versions of your Dropbox files:  1) a side-by-side diff within your browser, or 2) an external diff tool.  This can be TortoiseMerge, kdiff3, FileMerge, or any tool which can be triggered from a command line.
+From www.dropbox.com, in the "Version history" of any file, a column is added which allows you to select two versions to compare.  Click the "Diff" button to trigger your configured diff tool, or the "Inline" button to view the difference in-browser.
 
-In the "Version history" view of the Dropbox web interface of any file, a column is added which allows you to select two versions to compare.  Click the "Inline Diff" button to view the difference in-browser, or the "Diff" button to trigger your configured diff tool.
-
-Supports Windows, Mac, and Linux as far as I know, though I can't be sure every possible configuration is covered.  Note that the combined file-size limit in any comparison is 4GB.
+Supports Windows, Mac, and Linux as far as I know, though I can't be sure every possible configuration is covered.
 
 Please let me know if you run into any issues at http://blog.vicshih.com/2011/09/dropboxdiff-chrome-extension.html .
 
 
 ## Release History ##
+
+2017-01-18 update (version 1.0.2.15) - External diff restored; requires a separate "DropboxDiff Helper" installation.
 
 2017-01-05 update (version 1.0.2.14) - Inline diff restored; external diff support coming soon.  Removed NPAPI requirement, since it is no longer supported.
 

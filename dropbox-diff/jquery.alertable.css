@@ -10,8 +10,13 @@
     position: fixed;
     z-index: 9999;
     top: 38vh;
+/* vshih custom {
     left: calc(50% - 150px);
     width: 300px;
+*/
+    left: calc(50% - 250px);
+    width: 500px;
+/* } */
     background: white;
     border-radius: 4px;
     padding: 20px;
