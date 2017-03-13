@@ -6,7 +6,7 @@ Compare versions of your Dropbox files in-browser or with your configured diff t
 
 ## Current Version Release Notes: ##
 
-2017-03-13 update (version 1.0.2.21) - Bug fix for diffing non-text files.
+2017-03-13 update (version 1.0.2.21-22) - Bug fix for diffing non-text files, and files larger than 4K; please get latest "DropboxDiff Helper".
 
 2017-01-26 update (version 1.0.2.20) - Implement "Ignore exit status" option.
 

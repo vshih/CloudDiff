@@ -1,7 +1,7 @@
 {
 	"manifest_version": 2,
 	"name": "DropboxDiff",
-	"version": "1.0.2.21",
+	"version": "1.0.2.22",
 
 	"description": "Compare versions of your Dropbox files in-browser or with your configured diff tool. Trigger from any \"Version history\" page.",
 	"icons": {
