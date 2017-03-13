@@ -227,10 +227,11 @@ function computeFileName(url, sjid, changed) {
 function getFileText(url) {
 	if (url in TEXT_CACHE) return $.Deferred().resolve(TEXT_CACHE[url]);
 
-	return $.get(url).then(text => {
-		TEXT_CACHE[url] = text;
-		return text;
-	});
+	return $.ajax(url, {dataType: 'text'})
+		.then(text => {
+			TEXT_CACHE[url] = text;
+			return text;
+		});
 }
 
 
@@ -261,7 +262,8 @@ function diffOnClick(in_or_ex) {
 	$.when(
 		getFileText(files.left.url),
 		getFileText(files.right.url)
-	).done((left_text, right_text) => {
+	)
+	.done((left_text, right_text) => {
 		if (in_or_ex == 'in') {
 			let left_lines = difflib.stringAsLines(left_text);
 			let right_lines = difflib.stringAsLines(right_text);
@@ -310,6 +312,23 @@ function diffOnClick(in_or_ex) {
 				createExDiffResponseHandler(ex_data, tries, cleanup)
 			);
 		}
+	})
+	.fail((xhr, status, err) => {
+		$.alertable.alert(`
+			<p>
+				DropboxDiff failed with status "${status}", and error:
+			</p>
+
+			<blockquote>
+				${JSON.stringify(err, null, 2)}
+			</blockquote>
+
+			<p>
+				The JavaScript console of DropboxDiff's background page may have more information.
+			</p>
+			`,
+			{html: true}
+		);
 	});
 }
 

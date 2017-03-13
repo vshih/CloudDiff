@@ -23,7 +23,7 @@ function createExDiffResponseHandler(ex_data, tries, callback) {
 		default:
 			// Maybe a plugin failure; display it.
 			if (typeof response == 'object') {
-				response = JSON.stringify(response)
+				response = JSON.stringify(response);
 			}
 
 			let context_message = document.location.protocol != 'chrome-extension:' ? 'See the DropboxDiff Options page for instructions on how to install the DropboxDiff Helper.' : '';

@@ -6,6 +6,8 @@ Compare versions of your Dropbox files in-browser or with your configured diff t
 
 ## Current Version Release Notes: ##
 
+2017-03-13 update (version 1.0.2.21) - Bug fix for diffing non-text files.
+
 2017-01-26 update (version 1.0.2.20) - Implement "Ignore exit status" option.
 
 2017-01-22 update (versions 1.0.2.17-19) - Update installation instructions for Mac/Linux; bug fixes.

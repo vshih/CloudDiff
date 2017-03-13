@@ -18,6 +18,7 @@ function populateExamples() {
 	if (appVersion.indexOf('Mac') != -1) {
 		eg = [
 			`opendiff`,
+			`/Applications/p4merge.app/Contents/Resources/launchp4merge`,
 			`/usr/local/bin/mvim -d`,
 		];
 	}
