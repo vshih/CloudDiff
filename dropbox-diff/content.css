@@ -7,12 +7,8 @@
 	cursor: progress !important;
 }
 
-/* Disable diff buttons' hover effect when grayed. */
-.diff_button:hover.grayed {
-	background: -webkit-gradient(linear, left top, left bottom, from(#fffffe), to(#f4faff));
-}
-#exdiff_button {
-	margin-right: 521px;
+.diff-button {
+	margin: 2px;
 }
 
 /* Added radio buttons' container. */
@@ -21,9 +17,8 @@
 	width: 65px;
 }
 
-/* Differentiate added rows. */
-.tr-added {
-	background-color: #eee;
+#file-preview-modal .header .close {
+	padding: 8px !important;
 }
 
 
@@ -52,7 +47,7 @@ table.diff tbody {
 }
 table.diff thead,
 table.diff tbody th {
-	font-family: "Open Sans", "lucida grande", "Segoe UI", arial, verdana, "lucida sans unicode", tahoma, sans-serif;
+	font-family: "Open Sans", "Lucida Grande", "Segoe UI", Arial, Verdana, "Lucida Sans Unicode", Tahoma, sans-serif;
 }
 
 /* Adjust vertical alignment of lines slightly. */

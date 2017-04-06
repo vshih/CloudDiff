@@ -12,13 +12,12 @@ let $BODY;
 let $REV_DIV;
 
 // Reference for injecting page content.
-let $PAGE_CONTENT;
+let EMBEDDED_APP;
 
 // Inline diff-viewer references/values.
 let $INDIFF_VIEW;
 let $FILE_PREVIEW_MODAL;
-
-let PREVIEW_TOP_PX;
+let $PREVIEW;
 
 // Extracted revision information, keyed by sjid.
 let REV_MAP = {};
@@ -33,21 +32,23 @@ let TEXT_CACHE = {};
 function initBookmarks() {
 	$WINDOW				= $(window);
 	$BODY					= $(document.body);
-	$PAGE_CONTENT	= $('#page-content');
+	EMBEDDED_APP	= $('#embedded-app')[0];
 }
 
 
-// Register a callback to fire when React is done rendering/updating.
-// Disconnect immediately, since in our case we do our own mutating subsequently.
-// There's probably a proper way to do this using onComponentDidMount() but I don't know it.
-function onceNewContentListener(target, callback) {
-	let observer = new MutationObserver(mutations => {
-		observer.disconnect();
+function addNewContentListener(root, targetSelector, callback) {
+	let observer = new MutationObserver((mutations, observer) => {
+		let $targets = $(targetSelector);
 
-		callback(mutations);
+		if ($targets.length) {
+			$targets.each(function () {
+				callback.call(this, observer);
+			});
+			return;
+		}
 	});
 
-	observer.observe(target, {
+	observer.observe(root, {
 		childList: true,
 		subtree: true
 	});
@@ -77,24 +78,23 @@ function injectInlineDiffMarkup() {
 			</div>
 			<div class="header" style="cursor: default">
 				<a href="#" class="close lightbox-not-important">
-					<img class="sprite sprite_web s_web_control_close" alt="Close"
-						src="${close_icon_src}">
+					<img class="sprite sprite_web s_web_control_close" alt="Close" src="${close_icon_src}"/>
 				</a>
 			</div>
 		</div>
 	`);
 	$FILE_PREVIEW_MODAL = $('#file-preview-modal');
-	PREVIEW_TOP_PX = parseInt($FILE_PREVIEW_MODAL.find('.preview').css('top').replace(/px/, ''));
-	$INDIFF_VIEW = $('#indiff-view');
+	$PREVIEW = $FILE_PREVIEW_MODAL.find('.preview');
+	$INDIFF_VIEW = $FILE_PREVIEW_MODAL.find('#indiff-view');
 
 	// Handle close, ESC.
 	$FILE_PREVIEW_MODAL.find('.close').click(hideInlineDiff);
-	$(document).keyup((ev) => { if (ev.keyCode == 27) hideInlineDiff() });
+	$(document).keyup(ev => { if (ev.keyCode == 27) hideInlineDiff() });
 
 	$WINDOW.resize(windowOnResize);
 
 
-	$PAGE_CONTENT
+	$(EMBEDDED_APP)
 		.on('click', '.diff-sel', (ev) => {
 			// Prevent default preview pop-up for injected elements.
 			ev.stopPropagation();
@@ -106,7 +106,9 @@ function injectInlineDiffMarkup() {
 
 
 // Revision info is stored as a JSON object within a script tag.
-function initRevInfo() {
+function initRevInfo(observer) {
+	observer.disconnect();
+
 	// Assumptions:
 	//	- JSON is not minified.
 	//	- "revisions" array contains no "]" embedded characters.
@@ -115,13 +117,10 @@ function initRevInfo() {
 	let json = null;
 
 	// The "revisions" object is usually close to the end; search in reverse order.
-	for (let i = document.scripts.length - 1; i >= 0; --i) {
-		let match = document.scripts[i].innerText.match(find_revs_re);
+	let match = this.innerText.match(find_revs_re);
 
-		if (match) {
-			json = match[1];
-			break;
-		}
+	if (match) {
+		json = match[1];
 	}
 
 	if (!json) {
@@ -133,15 +132,12 @@ function initRevInfo() {
 }
 
 
-function initBookmarksMounted() {
-	$REV_DIV = $('.file-revisions-page__content');
-}
-
-
 // Insert diff buttons and handlers.
-function injectDiffButtons() {
-	$('#inner-page-header').prepend(`
-		<div style="display: inline-block; margin-left: 189px">
+function injectDiffButtons(observer) {
+	observer.disconnect();
+
+	$(this).prepend(`
+		<div class="file-revisions-page__head__filename">
 			<button id="exdiff" class="diff-button freshbutton-lightblue" disabled>Diff</button>
 			<button id="indiff" class="diff-button freshbutton-lightblue" disabled>Inline</button>
 		</div>
@@ -153,12 +149,12 @@ function injectDiffButtons() {
 }
 
 
-function injectRadioButtons() {
+function injectRadioButtons(observer) {
 	// Start from the end and work backwards, for the appended case.
-	$($REV_DIV.find('.file-revisions__row_fake_wrapper_col').get().reverse()).each((i, element) => {
+	$($(this).get().reverse()).each((i, element) => {
 		let $element = $(element);
 
-		if ($element.has('.diff-sel').length) { return false; }
+		if ($element.has('.diff-sel').length) { return false }
 
 		$element.prepend(`
 			<div class="file-revisions__row__col diff-sel">
@@ -174,7 +170,7 @@ function injectRadioButtons() {
 
 
 function getFileInfo(l_or_r) {
-	let $radio = $REV_DIV.find('input[name=diff-' + l_or_r + ']').filter(':checked');
+	let $radio = $REV_DIV.find(`input[name=diff-${l_or_r}]`).filter(':checked');
 
 	if ($radio.length != 1) { return null }
 
@@ -243,7 +239,7 @@ function refreshDiffButtons() {
 	let left = $('[name="diff-l"]:checked');
 	let right = $('[name="diff-r"]:checked');
 
-	$('.diff-button').prop('disabled', !(left.length && right.length && left.parent().get(0) != right.parent().get(0)));
+	$('.diff-button').prop('disabled', !(left.length && right.length && left.parent()[0] != right.parent()[0]));
 }
 
 
@@ -347,7 +343,11 @@ function hideInlineDiff() {
 
 // Dynamically calculate diff-modal viewport (simulate "max-height: 100%").
 function windowOnResize() {
-	if ($INDIFF_VIEW.is(':visible')) $INDIFF_VIEW.css({maxHeight: $WINDOW.height() - PREVIEW_TOP_PX});
+	if ($INDIFF_VIEW.is(':visible')) {
+		$INDIFF_VIEW.css({
+			maxHeight: $WINDOW.height() - parseInt($PREVIEW.css('top').replace(/px/, ''))
+		});
+	}
 }
 
 
@@ -376,33 +376,24 @@ function addNewRevisionsAjaxListener(callback) {
 }
 
 
-function onNewRevisionsMarkup(mutations) {
-	injectRadioButtons();
-	onceNewContentListener($PAGE_CONTENT[0], onNewRevisionsMarkup);
+function onRevisionsMarkup(observer) {
+	observer.disconnect();
+	$REV_DIV = $(this);
+	addNewContentListener(this, '.file-revisions__row_fake_wrapper_col', injectRadioButtons);
 }
 
 
 // ===== Main.
 
 
-// Stuff that can be initialized on document.ready.
 $(() => {
 	initBookmarks();
-	onceNewContentListener($PAGE_CONTENT[0], onReactReady);
 	injectInlineDiffMarkup();
-	initRevInfo();
 	addNewRevisionsAjaxListener(onNewRevisionsJson);
-});
-
-
-// Stuff that must be performed after React components are loaded.
-function onReactReady() {
-	initBookmarksMounted();
-	injectDiffButtons();
-	injectRadioButtons();
 	injectScript('content-inject.js');
 
-	// Listen for any new markup.
-	onceNewContentListener($PAGE_CONTENT[0], onNewRevisionsMarkup);
-}
+	addNewContentListener(EMBEDDED_APP, '.page-header__heading', injectDiffButtons);
+	addNewContentListener(EMBEDDED_APP, '.file-revisions-page__content', onRevisionsMarkup);
+	addNewContentListener(EMBEDDED_APP, 'script:contains("\"revisions\":")', initRevInfo);
+});
 

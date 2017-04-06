@@ -37,7 +37,7 @@ function onLoadOlderVersions(url, responseText) {
 // From http://stackoverflow.com/questions/13765031/scrape-eavesdrop-ajax-data-using-javascript/13768794#13768794
 function addAjaxSuccessListener(listener) {
 	let XHR = XMLHttpRequest.prototype;
-	// Remember references to original methods.
+	// Remember original methods.
 	let open = XHR.open;
 	let send = XHR.send;
 
@@ -53,7 +53,7 @@ function addAjaxSuccessListener(listener) {
 	XHR.send = function (post_data) {
 		this.addEventListener('load', function () {
 			if (this.status == 200) {
-				listener(this._url, this.responseText);
+				listener(this._url, this.response);
 			} // Fail silently.
 		});
 
