@@ -1,6 +1,8 @@
 
 # README #
 
+This is the source repository for https://chrome.google.com/webstore/detail/aefdkgcdokdiaoppobphjogcilaaakka.
+
 Compare versions of your Dropbox files in-browser or with your configured diff tool. Trigger from any "Version history" page.
 
 
