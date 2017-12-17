@@ -26,11 +26,11 @@ function createExDiffResponseHandler(ex_data, tries, callback) {
 				response = JSON.stringify(response);
 			}
 
-			let context_message = document.location.protocol != 'chrome-extension:' ? 'See the DropboxDiff Options page for instructions on how to install the DropboxDiff Helper.' : '';
+			let context_message = document.location.protocol != 'chrome-extension:' ? 'See the CloudDiff Options page for instructions on how to install the CloudDiff Helper.' : '';
 
 			$.alertable.alert(`
 				<p>
-					DropboxDiff failed with the message:
+					CloudDiff failed with the message:
 				</p>
 
 				<blockquote>
@@ -41,7 +41,7 @@ function createExDiffResponseHandler(ex_data, tries, callback) {
 					${context_message}
 				</p>
 				<p>
-					The JavaScript console of DropboxDiff's background page may have more information.
+					The JavaScript console of CloudDiff's background page may have more information.
 				</p>
 				`,
 				{html: true}

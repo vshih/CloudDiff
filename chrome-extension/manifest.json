@@ -1,9 +1,9 @@
 {
 	"manifest_version": 2,
-	"name": "DropboxDiff",
-	"version": "1.0.2.23",
+	"name": "CloudDiff",
+	"version": "1.0.2.24",
 
-	"description": "Compare versions of your Dropbox files in-browser or with your configured diff tool. Trigger from any \"Version history\" page.",
+	"description": "Compare versions of your cloud files in-browser or using your configured diff tool.",
 	"icons": {
 		"16": "16.png",
 		"48": "48.png",
@@ -44,7 +44,7 @@
 		"https://*.dropbox.com/*",
 		"nativeMessaging"
 	],
-	"short_name": "DropboxDiff",
+	"short_name": "CloudDiff",
 	"web_accessible_resources": [
 		"content-inject.js",
 		"icon_spacer-vflN3BYt2.gif"

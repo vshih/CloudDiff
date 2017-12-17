@@ -124,7 +124,7 @@ function initRevInfo(observer) {
 	}
 
 	if (!json) {
-		return window.alert('DropboxDiff failed to extract revision information.');
+		return window.alert('CloudDiff failed to extract revision information.');
 	}
 
 	let revisions = JSON.parse(json);

@@ -28,7 +28,7 @@ function onLoadOlderVersions(url, responseText) {
 			return;
 		}
 
-		document.dispatchEvent(new CustomEvent('com.vicshih.dropboxdiff.new-revisions-json', {detail: revisions}));
+		document.dispatchEvent(new CustomEvent('com.vicshih.clouddiff.new-revisions-json', {detail: revisions}));
 	}
 }
 

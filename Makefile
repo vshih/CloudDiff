@@ -2,9 +2,9 @@
 help:
 	@echo Available targets: help zip
 
-zip:	dropbox-diff.zip
+zip:	clouddiff.zip
 
-dropbox-diff.zip:	dropbox-diff
+clouddiff.zip:	chrome-extension
 	-rm -f $@
 	@zip -r $@ $^ -x \*.swp
 

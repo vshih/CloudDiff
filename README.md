@@ -10,7 +10,7 @@ Compare versions of your Dropbox files in-browser or with your configured diff t
 
 2017-04-18 update (version 1.0.2.23) - Update to match latest Dropbox format change.
 
-2017-03-13 update (version 1.0.2.21-22) - Bug fix for diffing non-text files, and files larger than 4K; please get latest "DropboxDiff Helper".
+2017-03-13 update (version 1.0.2.21-22) - Bug fix for diffing non-text files, and files larger than 4K; please get latest "CloudDiff Helper".
 
 2017-01-26 update (version 1.0.2.20) - Implement "Ignore exit status" option.
 
@@ -23,14 +23,14 @@ From www.dropbox.com, in the "Version history" of any file, a column is added wh
 
 Supports Windows, Mac, and Linux as far as I know, though I can't be sure every possible configuration is covered.
 
-Please let me know if you run into any issues at http://blog.vicshih.com/2011/09/dropboxdiff-chrome-extension.html .
+Please let me know if you run into any issues at http://blog.vicshih.com/2011/09/clouddiff-chrome-extension.html .
 
 
 ## Release History ##
 
 2017-01-21 update (version 1.0.2.16) - Support "Load older versions".
 
-2017-01-18 update (version 1.0.2.15) - External diff restored; requires a separate "DropboxDiff Helper" installation.
+2017-01-18 update (version 1.0.2.15) - External diff restored; requires a separate "CloudDiff Helper" installation.
 
 2017-01-05 update (version 1.0.2.14) - Inline diff restored; external diff support coming soon.  Removed NPAPI requirement, since it is no longer supported.
 
