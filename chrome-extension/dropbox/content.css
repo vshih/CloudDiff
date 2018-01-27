@@ -1,0 +1,11 @@
+
+.clouddiff-button {
+	margin: 2px;
+}
+
+/* For the injected radio buttons' container. */
+.clouddiff-selectors {
+	text-align: center;
+	width: 65px;
+}
+

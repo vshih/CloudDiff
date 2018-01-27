@@ -1,10 +1,10 @@
 <html>
 <head><title>CloudDiff Options</title>
-<link rel="stylesheet" type="text/css" href="jquery.alertable.css"/>
+<link rel="stylesheet" type="text/css" href="lib/jquery.alertable.css"/>
 <link rel="stylesheet" type="text/css" href="options.css"/>
-<script src="jquery-1.8.0.min.js"></script>
-<script src="jquery.alertable.min.js"></script>
-<script src="ex-handler.js"></script>
+<script src="lib/jquery-1.8.0.min.js"></script>
+<script src="lib/jquery.alertable.min.js"></script>
+<script src="common.js"></script>
 <script src="options.js"></script>
 <base target="_blank">
 </head>
@@ -27,11 +27,11 @@
 	<h3>External Diff Tool</h3>
 	<ol>
 		<li>Install the <a href="https://bitbucket.org/vshih/clouddiff-helper">CloudDiff Helper</a>:
-			<ul class="platform Win32">
-				<li>Download <a href="https://bitbucket.org/vshih/clouddiff-helper/downloads/clouddiff-helper_windows.exe">clouddiff-helper_windows.exe</a>.
+			<ul class="platform clouddiff-Win32">
+				<li>Download and open <a href="https://bitbucket.org/vshih/clouddiff-helper/downloads/clouddiff-helper_windows.exe">clouddiff-helper_windows.exe</a>.
 				<li>To bypass Windows SmartScreen, click the <i>More info</i> link, then the <i>Run anyway</i> button.
 			</ul>
-			<ul class="platform MacIntel Linux_x86_64">
+			<ul class="platform clouddiff-MacIntel clouddiff-Linux_x86_64">
 				<li>Open a Terminal window.
 				<li>Run the following command:  <code>curl -L https://bitbucket.org/vshih/clouddiff-helper/downloads/install.sh | sh</code>
 			</ul>
@@ -55,7 +55,7 @@
 	</div>
 	<div id="ignore-margin"></div>
 	<div id="ignore-box">
-		<label id="ignore-label" for="ignore-exit" title="Some programs like kdiff3 return an error code even on success.  Check this to ignore.">
+		<label id="ignore-label" for="ignore-exit" title="Some programs like KDiff3 return errors even on success; select this option to ignore any error codes.">
 			<input type="checkbox" id="ignore-exit"> Ignore exit status
 		</label>
 </div>

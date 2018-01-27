@@ -2,14 +2,12 @@
 	"manifest_version": 2,
 	"name": "CloudDiff",
 	"version": "1.0.2.24",
-
-	"description": "Compare versions of your cloud files in-browser or using your configured diff tool.",
+	"description": "Compare versions of your cloud text files in-browser or using your configured diff tool.",
 	"icons": {
 		"16": "16.png",
 		"48": "48.png",
 		"128": "128.png"
 	},
-
 	"author": "Victor Shih <victor.shih@gmail.com>",
 	"background": {
 		"page": "background.html",
@@ -17,36 +15,63 @@
 	},
 	"content_scripts": [
 		{
+			"matches": [
+				"https://www.dropbox.com/history/*",
+				"https://my.pcloud.com/*"
+			],
 			"css": [
-				"jquery.alertable.css",
-				"diffview.css",
-				"content.css"
+				"lib/jquery.alertable.css",
+				"lib/codemirror-5.33.0/lib/codemirror.css",
+				"lib/codemirror-5.33.0/addon/merge/merge.css",
+				"common.css"
 			],
 			"js": [
-				"jquery-1.8.0.min.js",
-				"jquery.alertable.min.js",
-				"difflib.js",
-				"diffview.js",
-				"ex-handler.js",
-				"content.js"
+				"lib/jquery-1.8.0.min.js",
+				"lib/jquery.alertable.min.js",
+				"lib/js.cookie.min.js",
+				"lib/diff_match_patch.js",
+				"lib/codemirror-5.33.0/lib/codemirror.js",
+				"lib/codemirror-5.33.0/addon/merge/merge.js",
+				"common.js"
 			],
+			"run_at": "document_end"
+		},
+		{
 			"matches": [
 				"https://www.dropbox.com/history/*"
+			],
+			"css": [
+				"dropbox/content.css"
+			],
+			"js": [
+				"dropbox/content.js"
+			],
+			"run_at": "document_end"
+		},
+		{
+			"matches": [
+				"https://my.pcloud.com/*"
+			],
+			"css": [
+				"pcloud/content.css"
+			],
+			"js": [
+				"pcloud/content.js"
 			],
 			"run_at": "document_end"
 		}
 	],
-	"content_security_policy": "default-src 'self' https://*.dropbox.com",
+	"content_security_policy": "default-src 'self'",
 	"minimum_chrome_version": "22.0.0.0",
 	"offline_enabled": false,
 	"options_page": "options.html",
 	"permissions": [
 		"https://*.dropbox.com/*",
+		"https://*.pcloud.com/*",
 		"nativeMessaging"
 	],
 	"short_name": "CloudDiff",
 	"web_accessible_resources": [
-		"content-inject.js",
-		"icon_spacer-vflN3BYt2.gif"
+		"dropbox/content-inject.js"
 	]
 }

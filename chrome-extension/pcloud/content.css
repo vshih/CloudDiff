@@ -1,0 +1,38 @@
+
+#clouddiff-dialog {
+	/* Show over .upload-container. */
+	z-index: 1900;
+}
+
+.clouddiff-buttons {
+	float: left;
+	line-height: 60px;
+}
+.clouddiff-button {
+	color: #2a2a2b;
+	font-size: 14px;
+	font-weight: 700;
+	padding: 4px 10px;
+}
+
+/* For the injected radio buttons' header, container. */
+.gridlist .clouddiff-th {
+	text-align: center;
+}
+/* Disable highlight on hover for clouddiff-th. */
+.gridlist .clouddiff-th:hover {
+	background-color: #f4f4f4;
+}
+.clouddiff-selectors {
+	padding-left: 0;
+	text-align: center;
+	width: 80px;
+}
+
+
+/* Platform-specific tweaks. */
+
+body.clouddiff-Win32 .clouddiff-selectors {
+	width: 84px;
+}
+

@@ -3,10 +3,24 @@
 
 This is the source repository for https://chrome.google.com/webstore/detail/aefdkgcdokdiaoppobphjogcilaaakka.
 
-Compare versions of your Dropbox files in-browser or with your configured diff tool. Trigger from any "Version history" page.
+Compare versions of your Dropbox or pCloud text files in-browser or with your configured diff tool.
 
 
 ## Current Version Release Notes: ##
+
+2018-xx-xx update (version 1.0.2.25) - pCloud support. Rebranded.
+
+
+Provides two options for comparing different versions of your Dropbox or pCloud files:  1) an external diff tool, or 2) a side-by-side diff within your browser.  This can be TortoiseMerge, KDiff3, FileMerge, or any tool which can be triggered from the command line.
+
+In the "Version history" or "Revisions" page of any file, a column is added which allows you to select two versions to compare.  Click the "Diff" button to trigger your configured diff tool, or the "Inline" button to view the difference in-browser.
+
+Supports Windows, Mac, and Linux as far as I know, though I can't be sure every possible configuration is covered.
+
+Please let me know if you run into any issues at http://blog.vicshih.com/2011/09/clouddiff-chrome-extension.html .
+
+
+## Release History ##
 
 2017-04-18 update (version 1.0.2.23) - Update to match latest Dropbox format change.
 
@@ -15,18 +29,6 @@ Compare versions of your Dropbox files in-browser or with your configured diff t
 2017-01-26 update (version 1.0.2.20) - Implement "Ignore exit status" option.
 
 2017-01-22 update (versions 1.0.2.17-19) - Update installation instructions for Mac/Linux; bug fixes.
-
-
-Provides two options for comparing different versions of your Dropbox files:  1) an external diff tool, or 2) a side-by-side diff within your browser.  This can be TortoiseMerge, KDiff3, FileMerge, or any tool which can be triggered from the command line.
-
-From www.dropbox.com, in the "Version history" of any file, a column is added which allows you to select two versions to compare.  Click the "Diff" button to trigger your configured diff tool, or the "Inline" button to view the difference in-browser.
-
-Supports Windows, Mac, and Linux as far as I know, though I can't be sure every possible configuration is covered.
-
-Please let me know if you run into any issues at http://blog.vicshih.com/2011/09/clouddiff-chrome-extension.html .
-
-
-## Release History ##
 
 2017-01-21 update (version 1.0.2.16) - Support "Load older versions".
 

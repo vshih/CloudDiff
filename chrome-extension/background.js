@@ -1,6 +1,7 @@
 
 'use strict';
 
+
 // Must match nativeMessagingHostName in bitbucket.org/vshih/dropboxdiff-helper/internal/install/install.go.
 const NATIVE_MESSAGING_HOST_NAME = 'com.vicshih.clouddiff.helper';
 

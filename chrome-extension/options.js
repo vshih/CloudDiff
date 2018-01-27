@@ -5,11 +5,6 @@
 const FLASH_TIMEOUT = 1800;
 
 
-function setPlatform() {
-	document.body.className += ' ' + navigator.platform.replace(/ /g, '_');
-}
-
-
 function populateExamples() {
 	let appVersion = navigator.appVersion;
 
@@ -20,6 +15,8 @@ function populateExamples() {
 			`opendiff`,
 			`/Applications/p4merge.app/Contents/Resources/launchp4merge`,
 			`/usr/local/bin/mvim -d`,
+			`open https://diffy.org$(git diff $1 $2 | curl -is https://diffy.org/new -F 'udiff=<-' | awk -F' to ' '/^Found/ {col = 2; print $col}')`,
+			`git diff $1 $2 | /usr/local/bin/node /usr/local/bin/diff2html -i stdin`,
 		];
 	}
 	else if (appVersion.indexOf('Linux') != -1) {
@@ -29,11 +26,13 @@ function populateExamples() {
 		];
 	}
 	else {
+		// Windows.
 		eg = [
-			`"C:\\Program Files (x86)\\KDiff3\\kdiff3.exe"`,
+			`"C:\\Program Files\\kdiff3\\kdiff3.exe"`,
 			`"C:\\Program Files\\Devart\\Code Compare\\CodeCompare.exe" /W`,
 			`"C:\\Program Files\\TortoiseSVN\\bin\\TortoiseMerge.exe"`,
 			`bash -c '"$HOME/bin/tkdiff" $1 $2'`,
+			`git diff $1 $2 | diff2html -i stdin`,
 		];
 	}
 
@@ -122,7 +121,7 @@ sunt in culpa qui officia deserunt mollit anim id est laborum.
 
 	chrome.extension.sendMessage(
 		ex_data,
-		createExDiffResponseHandler(ex_data, tries)
+		CloudDiff.createExDiffResponseHandler(ex_data, tries)
 	);
 }
 
@@ -139,7 +138,7 @@ function registerListeners() {
 
 
 function init() {
-	setPlatform();
+	CloudDiff.setPlatform();
 	populateExamples();
 	restoreOptions();
 	registerListeners();

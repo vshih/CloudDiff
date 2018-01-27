@@ -2,9 +2,9 @@ body { background-color: #f0f0f0 }
 * { font-family: Tahoma, Helvetica, Arial }
 
 .platform { display: none }
-body.Win32			.platform.Win32,
-body.MacIntel		.platform.MacIntel,
-body.Linux_x86_64	.platform.Linux_x86_64 { display: block }
+body.clouddiff-Win32		.platform.clouddiff-Win32,
+body.clouddiff-MacIntel		.platform.clouddiff-MacIntel,
+body.clouddiff-Linux_x86_64	.platform.clouddiff-Linux_x86_64 { display: block }
 
 code		{ cursor: pointer; padding: 5px 8px }
 /* Use <i> for identifiers. */
