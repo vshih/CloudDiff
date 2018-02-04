@@ -42,35 +42,36 @@ function populateExamples() {
 
 // Read from localStorage.
 function restoreOptions() {
-	window.cmd.value = localStorage.cmd || '';
-	window['ignore-exit'].checked = localStorage.ignoreExit;
+	$('#cmd').val(localStorage.cmd || '');
+	$('#ignore-exit').prop('checked', localStorage.ignoreExit === 'on');
 }
 
 
 function saveOptions() {
-	localStorage.cmd = window.cmd.value;
-	localStorage.ignoreExit = window['ignore-exit'].checked ? 'on' : '';
+	localStorage.cmd = $('#cmd').val();
+	localStorage.ignoreExit = $('#ignore-exit').is(':checked') ? 'on' : '';
 
 	// Show feedback.
-	window.saved.className = 'show';
-	setTimeout(() => { window.saved.className = '' }, FLASH_TIMEOUT);
+	$('#saved')
+		.css({visibility: 'visible'})
+		.delay(FLASH_TIMEOUT)
+		.queue(function (n) {
+			$(this).css({visibility: 'hidden'});
+			n();
+		});
 
 	// If there is a queued request, use that.
 	chrome.runtime.sendMessage({use_last: true});
 }
 
 
-// For code blocks, select all block text on click.
-function selectCodeBlockOnClick(event) {
-	let target = event.target;
-	if (target.tagName == 'CODE') {
-		let selection = window.getSelection();
-		if (selection.rangeCount > 0) { selection.removeAllRanges(); }
+function selectCodeBlockOnClick() {
+	let selection = window.getSelection();
+	if (selection.rangeCount > 0) { selection.removeAllRanges(); }
 
-		let range = document.createRange();
-		range.selectNode(target);
-		selection.addRange(range);
-	}
+	let range = document.createRange();
+	range.selectNode(this);
+	selection.addRange(range);
 }
 
 
@@ -127,23 +128,26 @@ sunt in culpa qui officia deserunt mollit anim id est laborum.
 
 
 function registerListeners() {
-	document.body.addEventListener('click', selectCodeBlockOnClick);
+	// Links to blog.
+	$('#blog-link').click(function () {
+		$(this).next().find('a').get(0).click();
+	});
+
+	// For code blocks, select all block text on click.
+	$('#examples').on('click', 'code', selectCodeBlockOnClick);
 
 	// Set up change handlers.
-	window.cmd.onchange = window['ignore-exit'].onchange = saveOptions;
+	$('#cmd, #ignore-exit').change(saveOptions);
 
 	// Test button.
-	document.getElementById('config-test').onclick = testConfig;
+	$('#config-test').click(testConfig);
 }
 
 
-function init() {
+$(() => {
 	CloudDiff.setPlatform();
 	populateExamples();
 	restoreOptions();
 	registerListeners();
-}
-
-
-window.onload = init;
+});
 

@@ -1,6 +1,5 @@
-dropbox-diff/plugin
-
 .DS_Store
 *.swp
 *.svn
 *.zip
+/test/chrome-extension/

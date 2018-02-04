@@ -18,10 +18,10 @@ a { text-decoration: none }
 a:hover { text-decoration: underline }
 
 #flash { text-align: center }
-#saved { visibility: hidden; background-color: yellow; padding: 7px 11px 7px 14px; border-radius: 8px }
-#saved.show { visibility: visible }
+#saved { background-color: yellow; padding: 7px 11px 7px 14px; border-radius: 8px; visibility: hidden }
 
 #margin { padding: 0 30px 0 20px; width: 232px }
+#blog-link { cursor: pointer }
 #content {
 	position: absolute;
 	left: 233px;
