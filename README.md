@@ -1,7 +1,7 @@
 
 # README #
 
-This is the source repository for CloudDiff (formerly DropboxDiff) - https://chrome.google.com/webstore/detail/aefdkgcdokdiaoppobphjogcilaaakka.
+This is the source repository for CloudDiff (formerly DropboxDiff) - https://chrome.google.com/webstore/detail/clouddiff/hlmlielnekakcdfpkbgcpnphenleogfp?hl=en-US&gl=US.
 
 Compare versions of your Dropbox or pCloud text files in-browser or with your configured diff tool.
 
