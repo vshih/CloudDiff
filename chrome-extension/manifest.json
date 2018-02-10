@@ -1,7 +1,7 @@
 {
 	"manifest_version": 2,
 	"name": "CloudDiff",
-	"version": "1.0.2.24",
+	"version": "1.0.2.25",
 	"description": "Compare versions of your cloud text files in-browser or using your configured diff tool.",
 	"icons": {
 		"16": "16.png",

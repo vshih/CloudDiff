@@ -8,7 +8,7 @@ Compare versions of your Dropbox or pCloud text files in-browser or with your co
 
 ## Current Version Release Notes: ##
 
-2018-02-01 update (version 1.0.2.24) - Rebrand as "CloudDiff."  pCloud support.
+2018-02-01 update (version 1.0.2.25) - Rebrand as "CloudDiff."  pCloud support.
 
 
 Provides two options for comparing different versions of your Dropbox or pCloud files:  1) an external diff tool, or 2) a side-by-side diff within your browser.  This can be TortoiseMerge, KDiff3, FileMerge, or any tool which can be triggered from the command line.

@@ -141,7 +141,7 @@ function onNewRevisionsJson(revisions) {
 
 
 function addNewRevisionsAjaxListener(callback) {
-	document.addEventListener('com.vicshih.dropboxdiff.new-revisions-json', customEvent => callback(customEvent.detail));
+	document.addEventListener('com.vicshih.clouddiff.new-revisions-json', customEvent => callback(customEvent.detail));
 }
 
 
