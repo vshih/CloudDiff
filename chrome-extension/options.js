@@ -134,7 +134,7 @@ function registerListeners() {
 	});
 
 	// For code blocks, select all block text on click.
-	$('#examples').on('click', 'code', selectCodeBlockOnClick);
+	$(document.body).on('click', 'code', selectCodeBlockOnClick);
 
 	// Set up change handlers.
 	$('#cmd, #ignore-exit').change(saveOptions);

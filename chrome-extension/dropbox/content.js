@@ -165,9 +165,9 @@ $(() => {
 	addNewRevisionsAjaxListener(onNewRevisionsJson);
 	injectScript('dropbox/content-inject.js');
 
-	CloudDiff.addNewContentListener(embedded_app, '.page-header__heading',							injectDiffButtons);
-	CloudDiff.addNewContentListener(embedded_app, '.file-revisions-page__content',			onRevisionsMarkup);
-	CloudDiff.addNewContentListener(embedded_app, 'script:contains("\"revisions\":")',	initRevInfo);
+	CloudDiff.addNewContentListener(document.body, '.page-header__heading',							injectDiffButtons);
+	CloudDiff.addNewContentListener(document.body, '.file-revisions-page__content',			onRevisionsMarkup);
+	CloudDiff.addNewContentListener(document.body, 'script:contains("\"revisions\":")',	initRevInfo);
 
 	$(embedded_app)
 		.on('click', '.clouddiff-selectors', (ev) => {

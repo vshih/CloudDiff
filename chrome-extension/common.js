@@ -84,14 +84,29 @@ CloudDiff.createExDiffResponseHandler = (ex_data, tries, callback) => {
 
 
 CloudDiff.addNewContentListener = (root, targetSelector, callback) => {
+	let $root = $(root);
+
+	let $targets = $root.find(targetSelector);
+	if ($targets.length) {
+		// Skip the observer and call the handler immediately.
+		let observer = {'disconnect': function () {}};
+		$targets.each(function () {
+			callback.call(this, observer);
+		});
+		return;
+	}
+
 	let observer = new MutationObserver((mutations, observer) => {
-		let $targets = $(targetSelector);
+		let $targets = $root.find(targetSelector);
 
 		if ($targets.length) {
+			console.log(targetSelector, 'found');
 			$targets.each(function () {
 				callback.call(this, observer);
 			});
 			return;
+		} else {
+			console.log(targetSelector, 'not found');
 		}
 	});
 
