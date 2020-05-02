@@ -87,7 +87,6 @@ Please let me know if you run into any issues at http://blog.vicshih.com/2011/09
 
 ## TODO ##
 - Extension
-  - Update screenshots
   - Options page
     - File extension-specific command configuration
   - Progress bars
@@ -95,7 +94,8 @@ Please let me know if you run into any issues at http://blog.vicshih.com/2011/09
 
 ## References ##
 
-- https://github.com/cemerick/jsdifflib
+- https://codemirror.net
+- https://github.com/google/diff-match-patch
 - https://github.com/claviska/jquery-alertable
 - http://stackoverflow.com/questions/9602022/chrome-extension-retrieving-gmails-original-message
 - http://www.techtalkz.com/microsoft-office-word/172251-invoking-compare-merge-command-line.html

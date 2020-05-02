@@ -65,3 +65,10 @@
 	height: 100%;
 }
 
+
+/* jquery.alertable.css overrides. */
+.alertable {
+    left: calc(50% - 250px);
+    width: 500px;
+}
+
