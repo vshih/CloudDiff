@@ -35,3 +35,15 @@ clouddiff.zip:	chrome-extension
 biggest:	clouddiff.zip
 	@unzip -lv $< | tail -n +4 | sort -k3nr | less
 
+
+test:
+	@echo $(subst .dot,.svg,$(wildcard doc/*.dot))
+
+doc:	$(subst .yml,.svg,$(wildcard doc/*.yml))
+
+doc/%.svg:	doc/%.dot
+	dot -Tsvg $< -o $@
+
+doc/%.dot:  doc/%.yml
+	bin/yml-to-dot.py $< > $@
+

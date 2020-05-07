@@ -1,0 +1,63 @@
+strict digraph "" {
+
+    graph [
+        label="Diff Flow"
+        style=dotted
+        labelloc=t
+        fontname=Arial
+        compound=true
+    ];
+    node [fontname=Arial];
+
+    // Actions.
+    node [shape=rect];
+
+    user_0 [label=<clicks diff <br/> (no auth token)>];
+    user_1 [label=<authorizes>];
+    content_0 [label=<queries storage for auth token; not found. <br/> triggers Dropbox auth page>];
+    content_1 [label=<writes token to storage, retrieves file contents, <br/> displays diff-view or sends info to background page>];
+    oauth_0 [label=<sends token to content script>];
+    bg_0 [label=<sends native message to helper, opening diff program>];
+
+    // Flow lines.
+    edge [color=blue weight=1000];
+
+    // f1
+    user_0
+    -> content_0
+    -> user_1
+    -> oauth_0
+    -> content_1
+    -> bg_0;
+
+    // Actors/swimlanes.
+    node [style=invis];
+    edge [style=invis weight=0 constraint=true];
+
+    subgraph cluster_user {
+        label="user"
+
+        user_0
+        -> user_1;
+    }
+
+    subgraph cluster_content {
+        label="content script"
+
+        content_0
+        -> content_1;
+    }
+
+    subgraph cluster_oauth {
+        label="OAuth receiver"
+
+        oauth_0;
+    }
+
+    subgraph cluster_bg {
+        label="background page"
+
+        bg_0;
+    }
+
+}
