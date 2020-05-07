@@ -9,21 +9,6 @@
 let CloudDiff = {};
 
 
-// ===== Abstract interface.
-
-
-// Implementations should override this function.
-//
-// Parameters:
-//	left_or_right - "left" | "right"
-// Returns:
-//	CloudDiff.FileInfo instance
-//
-CloudDiff.getFileInfo = (left_or_right) => {
-	CloudDiff.alert('CloudDiff.getFileInfo() not implemented');
-};
-
-
 // ===== Static methods.
 
 
@@ -89,7 +74,7 @@ CloudDiff.addNewContentListener = (root, targetSelector, callback) => {
 	let $targets = $root.find(targetSelector);
 	if ($targets.length) {
 		// Skip the observer and call the handler immediately.
-		let observer = {'disconnect': function () {}};
+		let observer = {disconnect: () => {}, takeRecords: () => {}};
 		$targets.each(function () {
 			callback.call(this, observer);
 		});
@@ -114,20 +99,6 @@ CloudDiff.addNewContentListener = (root, targetSelector, callback) => {
 		childList: true,
 		subtree: true
 	});
-};
-
-
-// Retrieve info of files to diff:  {is_valid, left, right}.
-CloudDiff.getFileInfos = () => {
-	let left = CloudDiff.getFileInfo('left');
-	let right = CloudDiff.getFileInfo('right');
-
-	return {
-		// Are they both selected, and different?
-		is_valid: () => left && right && left.id != right.id,
-		left,
-		right
-	};
 };
 
 
@@ -187,78 +158,115 @@ CloudDiff.Diff = class {
 		let $left = $('[name="diff-left"]:checked');
 		let $right = $('[name="diff-right"]:checked');
 
-		let is_disabled = !($left.length && $right.length && $left.parent()[0] != $right.parent()[0]);
+		let is_disabled = !(
+			$left.length &&
+			$right.length &&
+			$left.closest('.clouddiff-selectors')[0] != $right.closest('.clouddiff-selectors')[0]
+		);
 		$('.clouddiff-button').prop('disabled', is_disabled);
 	}
 
-	diffOnClick(element) {
+	async diffOnClick(source_element) {
 		// Retrieve left and right previews.
-		let files = CloudDiff.getFileInfos();
+		let files = await this.getFileInfos(source_element, null);
 
-		if (!files.is_valid()) { return }
+		if (!(files && files.is_valid)) { return }
 
 
 		// It's legit.
 		// Retrieve text for both files from cache or AJAX.
-		$.when(
-			files.left.fileTextPromise(),
-			files.right.fileTextPromise()
-		)
-		.done((left_text, right_text) => {
-			if (element.id === 'clouddiff-indiff') {
-				this.$content.empty();
-				// The wrapping element must be visible during .MergeView construction.
-				this.show(
-					files.left.label,
-					files.right.label
-				);
-				let mv = CodeMirror.MergeView(this.$content[0], {
-/*
-					// TODO Potential options for configurability.
-					connect: 'align' | '',
-					collapseIdentical: true | false | integer,
-					lineWrapping: bool,
-*/
-					lineNumbers: true,
-
-					value: right_text,
-					origLeft: left_text,
-					revertButtons: false
-				});
-			}
-			else {
-				// External diff.
-				let ex_data = {
-					left: {
-						name: files.left.uniqueName,
-						text: left_text
-					},
-					right: {
-						name: files.right.uniqueName,
-						text: right_text
-					}
-				};
-
-				// Even though the interaction is non-modal (e.g. the user can browse to the page again and trigger another diff),
-				// give at least some indication that we're doing something by changing the cursor to a spinner.
-				let $body = $(document.body).addClass('clouddiff-progress');
-				let cleanup = () => {
-					$body.removeClass('clouddiff-progress');
-				};
-
-				// Seems like this is more reliable now; try only once.
-				let tries = 1;
-
-				chrome.runtime.sendMessage(
-					ex_data,
-					CloudDiff.createExDiffResponseHandler(ex_data, tries, cleanup)
-				);
-			}
-		})
-		.fail((xhr, status, err) => {
-			CloudDiff.alert(`CloudDiff failed with status "${status}" and the following error
+		let left_text, right_text;
+		try {
+			// Assign promises to variables before awaiting to spawn in parallel.
+			let left_fetch = files.left.fetchFileText();
+			let right_fetch = files.right.fetchFileText();
+			left_text = await left_fetch;
+			right_text = await right_fetch;
+		}
+		catch (err) {
+			return CloudDiff.alert(`CloudDiff failed with the following error
 				(the JavaScript console of CloudDiff's background page may have more information):`, err);
-		});
+		}
+
+		if (source_element.id === 'clouddiff-indiff') {
+			this.$content.empty();
+			// The wrapping element must be visible during .MergeView construction.
+			this.show(
+				files.left.label,
+				files.right.label
+			);
+			let mv = CodeMirror.MergeView(this.$content[0], {
+				// Potential options for configurability.
+				// TODO scroll to first diff
+				//connect: 'align' | '',
+				//collapseIdentical: true | false | integer,
+				//lineWrapping: bool,
+				lineNumbers: true,
+
+				value: right_text,
+				origLeft: left_text,
+				revertButtons: false
+			});
+		}
+		else {
+			// External diff.
+			let ex_data = {
+				type: 'diff',
+				left: {
+					name: files.left.uniqueName,
+					text: left_text
+				},
+				right: {
+					name: files.right.uniqueName,
+					text: right_text
+				}
+			};
+
+			// Even though the interaction is non-modal (e.g. the user can browse to the page again and trigger another diff),
+			// give at least some indication that we're doing something by changing the cursor to a spinner.
+			let $body = $(document.body).addClass('clouddiff-progress');
+			let cleanup = () => {
+				$body.removeClass('clouddiff-progress');
+			};
+
+			// Seems like this is more reliable now; try only once.
+			let tries = 1;
+
+			chrome.runtime.sendMessage(
+				ex_data,
+				CloudDiff.createExDiffResponseHandler(ex_data, tries, cleanup)
+			);
+		}
+	}
+
+	// Retrieve info of files to diff.
+	//
+	// Parameters:
+	//  source_element - the HTML element which triggered the call
+	//  args - any arguments which should get passed to implementations' getFileInfo() invocation
+	// Returns:
+	//  Promise({left: <CloudDiff.FileInfo>, right: <CloudDiff.FileInfo>, is_valid: <Boolean>})
+	async getFileInfos(source_element, args) {
+		let left = this.getFileInfo('left', args);
+		let right = this.getFileInfo('right', args);
+
+		return {
+			left,
+			right,
+			// Are they both selected, and different?
+			is_valid: (left && right && left.id != right.id)
+		};
+	}
+
+	// Implementations should override this function.
+	//
+	// Parameters:
+	//	left_or_right - "left" | "right"
+	// Returns:
+	//	Promise(<CloudDiff.FileInfo>)
+	//
+	getFileInfo(left_or_right, args) {
+		throw 'CloudDiff.getFileInfo() not implemented';
 	}
 
 };
@@ -266,11 +274,12 @@ CloudDiff.Diff = class {
 
 CloudDiff.FileInfo = class {
 
-	constructor(name, modified, id, extra) {
-		this.name			= name;
-		this.modified	= modified;
-		this.id				= id;
-		this.extra		= extra;
+	constructor(name, modified, id, fetch_file_text_method, extra) {
+		this.name						= name;
+		this.modified				= modified;
+		this.id							= id;
+		this.fetchFileText	= fetch_file_text_method || (async () => {throw 'CloudDiff.FileInfo.fetchFileText() not implemented'});
+		this.extra					= extra;
 	}
 
 	get label() { return `${this.name} - ${this.modified}` }
@@ -287,12 +296,6 @@ CloudDiff.FileInfo = class {
 			// Sanitize any characters not allowed by file-systems.
 			.replace(/[\/\?<>\\:\*\|"^]/g, '_')
 			.trim();
-	}
-
-
-	// Abstract method.
-	fileTextPromise() {
-		CloudDiff.alert('CloudDiff.FileInfo.fileTextPromise() not implemented');
 	}
 
 };

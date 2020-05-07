@@ -9,7 +9,7 @@ const REV_TABLE_SELECTOR = 'div.gridlist.revisions table tbody';
 let DIFF;
 
 // Cache for retrieved file text.
-let TEXT_CACHE = {};
+let ID_TEXT_MAP = {};
 
 
 // ===== Functions - markup injection.
@@ -52,8 +52,12 @@ function injectTableHeader(observer) {
 function onRevisionsMarkup(observer) {
 	$(this).find('tr.gridline:not(:has(.clouddiff-selectors))').prepend(`
 		<td class="clouddiff-selectors">
-			<input type="radio" name="diff-left" title="left side"/>
-			<input type="radio" name="diff-right" title="right side"/>
+			<label>
+				<input type="radio" name="diff-left" title="left side"/>
+			</label>
+			<label>
+				<input type="radio" name="diff-right" title="right side"/>
+			</label>
 		</td>
 	`);
 
@@ -63,68 +67,57 @@ function onRevisionsMarkup(observer) {
 
 // ===== Interface implementation.
 
-CloudDiff.getFileInfo = (left_or_right) => {
-	let $row = $(REV_TABLE_SELECTOR).find(`input[name=diff-${left_or_right}]`).filter(':checked').closest('tr');
-	if ($row.length != 1) { return null }
+async function fetchFileText() {
+	const id = this.id;
+	const {fileid, auth} = this.extra;
 
-	let file = $row.find('.filename').text(),
-		created = $row.find('td:last-child').text().trim(),
-		revision = $row.find('.revid').text(),
-		file_info = new CloudDiff.FileInfo(file, created, revision);
+	if (!(id in ID_TEXT_MAP)) {
+		ID_TEXT_MAP[id] = await $.get(computeFileUrl(fileid, id, auth));
+	}
+	return ID_TEXT_MAP[id];
+}
 
-	// Override fileTextPromise().
-	file_info.fileTextPromise = function () {
-		let id = this.id;
-		if (id in TEXT_CACHE) return $.Deferred().resolve(TEXT_CACHE[id]);
+class DiffPCloud extends CloudDiff.Diff {
+	getFileInfo(left_or_right, args) {
+		const $row = $(REV_TABLE_SELECTOR).find(`input[name=diff-${left_or_right}]`).filter(':checked').closest('tr');
+		if ($row.length != 1) { return null }
 
-		// First get the file metadata.
-		let meta_url = computeMetaUrl(computeFileid(), id, computeAuth());
-
-		return $.getJSON(meta_url)
-			.then(json => {
-				if (json.hosts && json.hosts[0] && json.path) {
-					// Retrieve the actual file.
-					return $.ajax(`https://${json.hosts[0]}${json.path}`, {dataType: 'text'})
-						.then(text => {
-							TEXT_CACHE[id] = text;
-							return text;
-						});
-				}
-				else {
-					CloudDiff.alert('Failed to retrieve/parse file information:', json);
-				}
-			});
-	};
-
-	return file_info;
-};
+		const auth = computeAuth(),
+			fileid = computeFileid(),
+			file = $row.find('.filename').text(),
+			created = $row.find('td:last-child').text().trim(),
+			revision = $row.find('.revid').text(),
+			extra = {
+				fileid,
+				auth,
+			};
+		return new CloudDiff.FileInfo(file, created, revision, fetchFileText, extra);
+	}
+}
 
 
 // Private helper functions.
 
 function computeFileid() {
 	let match = document.location.hash.match(/fileid=(\d+)/);
-	if (match) {
-		return match[1];
-	}
+	return match ? match[1] : null;
 }
 
 function computeAuth() {
 	return Cookies.get('pcauth');
 }
 
-function computeMetaUrl(fileid, revid, auth) {
+function computeFileUrl(fileid, revid, auth) {
 	let params = {
-		fileid: fileid,
-		forcedownload: 1,
-		auth: Cookies.get('pcauth')
+		fileid,
+		auth,
 	};
 
 	if (revid != 'Current') {
 		params.revisionid = revid;
 	}
 
-	return 'https://api.pcloud.com/getfilelink?' + $.param(params);
+	return 'https://api.pcloud.com/gettextfile?' + $.param(params);
 }
 
 
@@ -136,7 +129,7 @@ $(() => {
 
 	let megawrap = $('.megawrap')[0];
 
-	DIFF = new CloudDiff.Diff(megawrap);
+	DIFF = new DiffPCloud(megawrap);
 
 	CloudDiff.addNewContentListener(megawrap, 'div.gridlist.revisions table thead', injectTableHeader);
 	CloudDiff.addNewContentListener(megawrap, '.logo-place',												injectDiffButtons);

@@ -28,6 +28,10 @@
 	text-align: center;
 	width: 80px;
 }
+/* Enlarge click area for left/right radio buttons. */
+.clouddiff-selectors label {
+	padding: 15px 5px;
+}
 
 
 /* Platform-specific tweaks. */

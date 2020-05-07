@@ -1,19 +1,32 @@
 
 'use strict';
 
-
 // ===== Globals/bookmarks.
+
+const APP_KEY = 'j9zuibfjn4j82u4';
 
 let DIFF;
 
 // Root node of the revisions-list markup.
 let $REV_DIV;
 
-// Extracted revision information, keyed by sjid.
-let REV_MAP = {};
+// Store these values once computed for the current page.
+let FILENAME;
+let FQ_PATH;
 
-// Cache for retrieved file text.
-let TEXT_CACHE = {};
+// Map sjid's (the identifiers in markup) to ts's (timestamp).
+// Computed from JavaScript script tag in DOM.
+let SJID_TS_MAP = {};
+
+// Map ts's to revision IDs.
+// Computed from filesListRevisions API results.
+let TS_REV_MAP;
+
+// Map revision to cached file text.
+let REV_TEXT_MAP = {};
+
+// Queue the element which triggered a diff, if necessary.
+let LAST_SOURCE_ELEMENT;
 
 
 // ===== Functions - markup injection and extraction.
@@ -32,7 +45,6 @@ function initRevInfo(observer) {
 
 	// The "revisions" object is usually close to the end; search in reverse order.
 	let match = this.innerText.match(find_revs_re);
-
 	if (match) {
 		json = match[1];
 	}
@@ -72,55 +84,101 @@ function injectRadioButtons(observer) {
 
 		$element.prepend(`
 			<div class="file-revisions__row__col clouddiff-selectors">
-				<input type="radio" name="diff-left" title="left side"/>
-				<input type="radio" name="diff-right" title="right side"/>
+				<label>
+					<input type="radio" name="diff-left" title="left side"/>
+				</label>
+				<label>
+					<input type="radio" name="diff-right" title="right side"/>
+				</label>
 			</div>
 		`);
 	});
 }
 
 
-// ===== Interface implementation.
-
-CloudDiff.getFileInfo = (left_or_right) => {
-	let $row = $REV_DIV.find(`input[name=diff-${left_or_right}]`).filter(':checked').closest('li');
-	if ($row.length != 1) { return null }
-
-	let sjid			= $row.data('identity').split('_')[1];
-	let url				= REV_MAP[sjid];
-	let name			= extractFileName(url);
-	let modified	= $row.find('.file-revisions__text--time').text().trim();
-
-	let file_info = new CloudDiff.FileInfo(name, modified, sjid, {url: url});
-
-	file_info.fileTextPromise = function () {
-		let url = this.extra.url;
-		if (url in TEXT_CACHE) return $.Deferred().resolve(TEXT_CACHE[url]);
-
-		return $.ajax(url, {dataType: 'text'})
-			.then(text => {
-				TEXT_CACHE[url] = text;
-				return text;
-			});
-	};
-
-	return file_info;
+function accessTokenChanged(changes, namespace) {
+	if (namespace == 'sync' && changes.accessToken && LAST_SOURCE_ELEMENT) {
+		DIFF.diffOnClick(LAST_SOURCE_ELEMENT);
+	}
 }
 
 
-// Helper functions.
+function getAccessToken() {
+	return new Promise(function (resolve, reject) {
+		chrome.storage.sync.get('accessToken', function (result) {
+			resolve(result.accessToken);
+		});
+	});
+}
 
-function extractFileName(url) {
-	// Extract filename from URL.
-	let basename = url.substr(url.lastIndexOf('/') + 1);
-	return decodeURIComponent(basename.substr(0, basename.indexOf('?')));
+
+// ===== Interface implementation.
+
+async function fetchFileText() {
+	const {dbx, rev} = this.extra;
+
+	if (!(rev in REV_TEXT_MAP)) {
+		// Download file.
+		let file_meta = await dbx.filesDownload({path: `rev:${rev}`});
+		REV_TEXT_MAP[rev] = await file_meta.fileBlob.text();
+	}
+	return REV_TEXT_MAP[rev];
+}
+
+class DiffDropbox extends CloudDiff.Diff {
+	async getFileInfos(source_element, args) {
+		const access_token = await getAccessToken();
+
+		if (access_token) {
+			LAST_SOURCE_ELEMENT = null;
+		} else {
+			LAST_SOURCE_ELEMENT = source_element;
+
+			// Trigger OAuth flow.
+			let dbx = new Dropbox.Dropbox({clientId: APP_KEY, fetch: window.fetch}),
+				receiver_path = chrome.runtime.getURL('dropbox/oauth-receiver.html'),
+				auth_url = dbx.getAuthenticationUrl(receiver_path);
+			window.open(auth_url, '_blank');
+			return null;
+		}
+
+		// Retrieve revisions for the current file.
+		let dbx = new Dropbox.Dropbox({accessToken: access_token, fetch: window.fetch});
+		if (!TS_REV_MAP) {
+			TS_REV_MAP = {};
+
+			const revisions = await dbx.filesListRevisions({path: FQ_PATH, mode: {'.tag': 'path'}, limit: 100});
+			revisions.entries.forEach(entry => {
+				TS_REV_MAP[new Date(entry.server_modified).getTime()] = entry.rev;
+			});
+		}
+
+		return super.getFileInfos(source_element, {dbx});
+	}
+
+	getFileInfo(left_or_right, {dbx}) {
+		const $row = $REV_DIV.find(`input[name=diff-${left_or_right}]`).filter(':checked').closest('li');
+		if ($row.length != 1) { return null }
+
+		const sjid = $row.data('identity').split('_')[1],
+			ts = SJID_TS_MAP[sjid];
+		if (!(ts in TS_REV_MAP)) { throw `Revision ${ts} not found for "${FQ_PATH}"` }
+
+		const rev = TS_REV_MAP[ts],
+			modified = $row.find('.file-revisions__text--time').text().trim(),
+			extra = {
+				dbx,
+				rev
+			};
+		return new CloudDiff.FileInfo(FILENAME, modified, sjid, fetchFileText, extra);
+	}
 }
 
 
 // ===== Functions - UI, event handling.
 
 
-// From http://stackoverflow.com/questions/9515704/building-a-chrome-extension-inject-code-in-a-page-using-a-content-script/9517879#9517879, method 1.
+// From https://stackoverflow.com/a/9517879/97439, method 1.
 function injectScript(script) {
 	let scriptElement = document.createElement('script');
 	scriptElement.src = chrome.extension.getURL(script);
@@ -132,10 +190,14 @@ function injectScript(script) {
 
 
 function onNewRevisionsJson(revisions) {
-	// Example direct_blockserver_link values:
-	//	//dl-web.dropbox.com/get/{path}/{file}.{ext}?_subject_uid=1252292&revision_id=AsKy...&w=AAD...
 	revisions.forEach(revision => {
-		REV_MAP[revision.id] = revision.preview_info.direct_blockserver_link;
+		SJID_TS_MAP[revision.preview_info.sjid] = revision.ts;
+
+		if (!FILENAME) {
+			// Assume all revisions have the same value.
+			FILENAME = revision.preview_info.filename;
+			FQ_PATH = revision.preview_info.fq_path;
+		}
 	});
 }
 
@@ -160,19 +222,22 @@ $(() => {
 
 	let embedded_app = $('#embedded-app')[0];
 
-	DIFF = new CloudDiff.Diff(embedded_app);
+	DIFF = new DiffDropbox(embedded_app);
 
 	addNewRevisionsAjaxListener(onNewRevisionsJson);
 	injectScript('dropbox/content-inject.js');
 
 	CloudDiff.addNewContentListener(document.body, '.page-header__heading',							injectDiffButtons);
 	CloudDiff.addNewContentListener(document.body, '.file-revisions-page__content',			onRevisionsMarkup);
-	CloudDiff.addNewContentListener(document.body, 'script:contains("\"revisions\":")',	initRevInfo);
+	CloudDiff.addNewContentListener(document.body, 'script:contains(\'"revisions":\')',	initRevInfo);
+
+	// Listen for OAuth token in storage.
+	chrome.storage.onChanged.addListener(accessTokenChanged);
 
 	$(embedded_app)
 		.on('click', '.clouddiff-selectors', (ev) => {
 			// Prevent default preview pop-up for injected elements.
 			ev.stopPropagation();
-		});
+		})
 });
 

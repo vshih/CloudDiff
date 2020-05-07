@@ -61,7 +61,7 @@ function saveOptions() {
 		});
 
 	// If there is a queued request, use that.
-	chrome.runtime.sendMessage({use_last: true});
+	chrome.runtime.sendMessage({type: 'diff', use_last: true});
 }
 
 
@@ -109,6 +109,7 @@ sunt in culpa qui officia deserunt mollit anim id est laborum.
 		'(This line was added.)\n';
 
 	let ex_data = {
+		type: 'diff',
 		left: {
 			name: `Left test file ${timestamp}.txt`,
 			text: content_left

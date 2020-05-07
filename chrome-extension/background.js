@@ -8,10 +8,8 @@ const NATIVE_MESSAGING_HOST_NAME = 'com.vicshih.clouddiff.helper';
 // Remember last request if configuration is still needed.
 let LAST_REQUEST;
 
-
-function init() {
-	// Set up request listener.
-	chrome.runtime.onMessage.addListener((request, sender, send_response) => {
+let HANDLER = {
+	diff(message, send_response) {
 		let cmd = localStorage.cmd;
 
 		if (!cmd) {
@@ -65,8 +63,17 @@ function init() {
 
 		// We must return true in order to send a response after the listener returns.
 		return true;
+	}
+};
+
+
+function init() {
+	// Set up message listener.
+	chrome.runtime.onMessage.addListener((message, sender, send_response) => {
+		HANDLER[message.type].call(HANDLER, message, send_response);
 	});
 }
+
 
 init();
 

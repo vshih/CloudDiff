@@ -9,3 +9,8 @@
 	width: 65px;
 }
 
+/* Enlarge click area for left/right radio buttons. */
+.clouddiff-selectors label {
+	padding: 26px 3px;
+}
+
