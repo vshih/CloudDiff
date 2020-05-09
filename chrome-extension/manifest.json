@@ -44,6 +44,7 @@
 				"dropbox/content.css"
 			],
 			"js": [
+				"dropbox/Dropbox-sdk.min.js",
 				"dropbox/content.js"
 			],
 			"run_at": "document_end"
@@ -62,16 +63,20 @@
 		}
 	],
 	"content_security_policy": "default-src 'self'",
-	"minimum_chrome_version": "22.0.0.0",
+	"minimum_chrome_version": "35.0.0.0",
 	"offline_enabled": false,
 	"options_page": "options.html",
 	"permissions": [
-		"https://*.dropbox.com/*",
-		"https://*.pcloud.com/*",
-		"nativeMessaging"
+		"https://my.pcloud.com/*",
+		"https://www.dropbox.com/history/*",
+
+		"nativeMessaging",
+		"storage"
 	],
 	"short_name": "CloudDiff",
 	"web_accessible_resources": [
-		"dropbox/content-inject.js"
+		"dropbox/content-inject.js",
+		"dropbox/oauth-receiver.html",
+		"dropbox/oauth-receiver.js"
 	]
 }
