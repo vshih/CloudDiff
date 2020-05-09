@@ -60,14 +60,16 @@ function saveOptions() {
 			n();
 		});
 
-	// If there is a queued request, use that.
-	chrome.runtime.sendMessage({type: 'diff', use_last: true});
+	if (localStorage.cmd) {
+		// If there is a queued request, resume it.
+		chrome.runtime.sendMessage({sender: 'options', type: 'diff', resume: true});
+	}
 }
 
 
 function selectCodeBlockOnClick() {
 	let selection = window.getSelection();
-	if (selection.rangeCount > 0) { selection.removeAllRanges(); }
+	if (selection.rangeCount > 0) { selection.removeAllRanges() }
 
 	let range = document.createRange();
 	range.selectNode(this);
@@ -78,7 +80,7 @@ function selectCodeBlockOnClick() {
 // Test run.
 function testConfig() {
 	// Ignore if no command is configured yet.
-	if (window.cmd.value.replace(/\s+/g, '').length === 0) return;
+	if (window.cmd.value.replace(/\s+/g, '').length === 0) { return }
 
 
 	// Generate a timestamp to make each test file unique.
@@ -109,6 +111,7 @@ sunt in culpa qui officia deserunt mollit anim id est laborum.
 		'(This line was added.)\n';
 
 	let ex_data = {
+		sender: 'options',
 		type: 'diff',
 		left: {
 			name: `Left test file ${timestamp}.txt`,
@@ -119,12 +122,8 @@ sunt in culpa qui officia deserunt mollit anim id est laborum.
 			text: content_right
 		}
 	};
-	let tries = 1;
 
-	chrome.extension.sendMessage(
-		ex_data,
-		CloudDiff.createExDiffResponseHandler(ex_data, tries)
-	);
+	chrome.extension.sendMessage(ex_data, CloudDiff.exDiffResponseHandler);
 }
 
 

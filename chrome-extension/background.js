@@ -10,31 +10,39 @@ let LAST_REQUEST;
 
 let HANDLER = {
 	diff(message, send_response) {
-		let cmd = localStorage.cmd;
+		// Special handling if resuming a previous request.
+		const resume = message.resume;
 
-		if (!cmd) {
-			// Trigger the options page.
-			LAST_REQUEST = {
-				request: request,
-				send_response: send_response
-			};
-			chrome.tabs.create({url: 'options.html'});
-			return send_response('');
+		if (resume) {
+			if (LAST_REQUEST) {
+				message = LAST_REQUEST.message;
+				send_response = LAST_REQUEST.send_response;
+				LAST_REQUEST = null;
+			} else {
+				// Nothing to retry.
+				send_response('OK');
+				return;
+			}
 		}
 
-		if (request.use_last && LAST_REQUEST) {
-			request				= LAST_REQUEST.request;
-			send_response	= LAST_REQUEST.send_response;
+		const cmd = localStorage.cmd;
 
+		if (cmd || message.sender == 'options') {
+			// Clear state in most cases.
 			LAST_REQUEST = null;
+		} else {
+			// Save the current message and trigger the Options page.
+			LAST_REQUEST = {message, send_response};
+			chrome.tabs.create({url: 'options.html'});
+			return true;
 		}
 
 		chrome.runtime.sendNativeMessage(
 			NATIVE_MESSAGING_HOST_NAME,
 			{
-				cmd: cmd,
-				left: request.left,
-				right: request.right
+				cmd,
+				left: message.left,
+				right: message.right
 			},
 			(response) => {
 				if (response) {
@@ -42,12 +50,12 @@ let HANDLER = {
 
 					if (response.ExitStatus == 0) {
 						// Success.
-						send_response('');
+						send_response('OK');
 					}
 					else {
 						if (localStorage.ignoreExit) {
 							console.log("Non-zero exit status ignored.");
-							send_response('');
+							send_response('OK');
 						}
 						else {
 							send_response(response.Output);
@@ -61,7 +69,7 @@ let HANDLER = {
 			}
 		);
 
-		// We must return true in order to send a response after the listener returns.
+		// Response is fired upon completion of sendNativeMessage; return `true` to signal asynchronous response.
 		return true;
 	}
 };

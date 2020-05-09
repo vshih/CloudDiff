@@ -32,39 +32,25 @@ CloudDiff.alert = (s, obj) => {
 };
 
 
-CloudDiff.createExDiffResponseHandler = (ex_data, tries, callback) => {
-	let handler = (response) => {
-		switch (response) {
-		case '':
-			// Success.
+CloudDiff.exDiffResponseHandler = (response) => {
+	switch (response) {
+		case 'OK':
+		case undefined:
+			// Success, or intial return for async call.
 			break;
 
-		case null:
-		case undefined:
-			// Probably the event page was inactive; try again after a short delay.  Note that this is a workaround for
-			// what seems like a Chrome bug.
-			--tries;
-			if (tries > 0) {
-				window.setTimeout(() => { chrome.runtime.sendMessage(ex_data, handler) }, 500);
-				break;
-			}
-			// else fall through.
-
 		default:
-			let context_message = document.location.protocol != 'chrome-extension:' ? '; see the CloudDiff Options page for instructions on how to install the CloudDiff Helper' : '';
+			// Something was returned; alert it.
+			// Customize message if triggered from a page other than the "options" page.
+			let context_message = document.location.protocol == 'chrome-extension:'
+				? ''
+				: '; see the CloudDiff Options page for instructions on how to install the CloudDiff Helper';
 
 			CloudDiff.alert(`
 				CloudDiff failed with the message below${context_message}.
 				The JavaScript console of CloudDiff's background page may have more information.`, response);
 			break;
-		}
-
-		if (callback) {
-			callback();
-		}
-	};
-
-	return handler;
+	}
 };
 
 
@@ -211,6 +197,7 @@ CloudDiff.Diff = class {
 		else {
 			// External diff.
 			let ex_data = {
+				sender: 'content',
 				type: 'diff',
 				left: {
 					name: files.left.uniqueName,
@@ -224,17 +211,15 @@ CloudDiff.Diff = class {
 
 			// Even though the interaction is non-modal (e.g. the user can browse to the page again and trigger another diff),
 			// give at least some indication that we're doing something by changing the cursor to a spinner.
+			// (Though if the configured command spawns and returns immediately, the cursor won't actually change for a long enough time to be noticeable.)
+			// TODO implement a minimum 2 second waiting period
 			let $body = $(document.body).addClass('clouddiff-progress');
-			let cleanup = () => {
-				$body.removeClass('clouddiff-progress');
-			};
-
-			// Seems like this is more reliable now; try only once.
-			let tries = 1;
-
 			chrome.runtime.sendMessage(
 				ex_data,
-				CloudDiff.createExDiffResponseHandler(ex_data, tries, cleanup)
+				(response) => {
+					CloudDiff.exDiffResponseHandler(response);
+					$body.removeClass('clouddiff-progress');
+				}
 			);
 		}
 	}
