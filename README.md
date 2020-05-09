@@ -8,7 +8,7 @@ Compare versions of your Dropbox or pCloud text files in-browser or with your co
 
 ## Current Version Release Notes: ##
 
-2018-02-01 update (version 1.0.2.25) - Rebrand as "CloudDiff."  pCloud support.
+2020-05-08 update (version 1.0.2.26) - Use Dropbox API to circumvent CORB issue; use the chrome.storage API to store OAuth access token.
 
 
 Provides two options for comparing different versions of your Dropbox or pCloud files:  1) an external diff tool, or 2) a side-by-side diff within your browser.  This can be TortoiseMerge, KDiff3, FileMerge, or any tool which can be triggered from the command line.
@@ -21,6 +21,8 @@ Please let me know if you run into any issues at http://blog.vicshih.com/2011/09
 
 
 ## Release History ##
+
+2018-02-01 update (version 1.0.2.25) - Rebrand as "CloudDiff."  pCloud support.  Switch from jsdifflib to CodeMirror for inline diff.
 
 2017-04-18 update (version 1.0.2.23) - Update to match latest Dropbox format change.
 
@@ -87,6 +89,8 @@ Please let me know if you run into any issues at http://blog.vicshih.com/2011/09
 
 ## TODO ##
 - Extension
+  - Jump to first diff in inline diff
+  - Make "nativeMessaging" permission optional
   - Options page
     - File extension-specific command configuration
   - Progress bars
