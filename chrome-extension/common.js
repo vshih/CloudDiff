@@ -8,6 +8,9 @@
 
 let CloudDiff = {};
 
+// For busy-cursor minimum timeout.
+let BUSY_CURSOR_IGNORE_EVENT;
+
 
 // ===== Static methods.
 
@@ -42,7 +45,7 @@ CloudDiff.exDiffResponseHandler = (response) => {
 		default:
 			// Something was returned; alert it.
 			// Customize message if triggered from a page other than the "options" page.
-			let context_message = document.location.protocol == 'chrome-extension:'
+			const context_message = document.location.protocol == 'chrome-extension:'
 				? ''
 				: '; see the CloudDiff Options page for instructions on how to install the CloudDiff Helper';
 
@@ -55,12 +58,15 @@ CloudDiff.exDiffResponseHandler = (response) => {
 
 
 CloudDiff.addNewContentListener = (root, targetSelector, callback) => {
-	let $root = $(root);
+	const $root = $(root);
 
-	let $targets = $root.find(targetSelector);
+	const $targets = $root.find(targetSelector);
 	if ($targets.length) {
 		// Skip the observer and call the handler immediately.
-		let observer = {disconnect: () => {}, takeRecords: () => {}};
+		let observer = {
+			disconnect: () => {},
+			takeRecords: () => {}
+		};
 		$targets.each(function () {
 			callback.call(this, observer);
 		});
@@ -68,16 +74,13 @@ CloudDiff.addNewContentListener = (root, targetSelector, callback) => {
 	}
 
 	let observer = new MutationObserver((mutations, observer) => {
-		let $targets = $root.find(targetSelector);
+		const $targets = $root.find(targetSelector);
 
 		if ($targets.length) {
-			console.log(targetSelector, 'found');
 			$targets.each(function () {
 				callback.call(this, observer);
 			});
 			return;
-		} else {
-			console.log(targetSelector, 'not found');
 		}
 	});
 
@@ -121,7 +124,7 @@ CloudDiff.Diff = class {
 
 	show(left_label, right_label) {
 		// Disable any scrolling.
-		let $html = $('html');
+		const $html = $('html');
 		// Save existing overflowY value.
 		this.prev_overflow = $html.css('overflowY');
 		$html.css({overflowY: 'hidden'});
@@ -141,20 +144,19 @@ CloudDiff.Diff = class {
 
 	// Update "enable" status of diff buttons.
 	refreshDiffButtons() {
-		let $left = $('[name="diff-left"]:checked');
-		let $right = $('[name="diff-right"]:checked');
-
-		let is_disabled = !(
-			$left.length &&
-			$right.length &&
-			$left.closest('.clouddiff-selectors')[0] != $right.closest('.clouddiff-selectors')[0]
-		);
+		const $left = $('[name="diff-left"]:checked'),
+			$right = $('[name="diff-right"]:checked'),
+			is_disabled = !(
+				$left.length &&
+				$right.length &&
+				$left.closest('.clouddiff-selectors')[0] != $right.closest('.clouddiff-selectors')[0]
+			);
 		$('.clouddiff-button').prop('disabled', is_disabled);
 	}
 
 	async diffOnClick(source_element) {
 		// Retrieve left and right previews.
-		let files = await this.getFileInfos(source_element, null);
+		const files = await this.getFileInfos(source_element, null);
 
 		if (!(files && files.is_valid)) { return }
 
@@ -181,7 +183,7 @@ CloudDiff.Diff = class {
 				files.left.label,
 				files.right.label
 			);
-			let mv = CodeMirror.MergeView(this.$content[0], {
+			CodeMirror.MergeView(this.$content[0], {
 				// Potential options for configurability.
 				// TODO scroll to first diff
 				//connect: 'align' | '',
@@ -196,7 +198,7 @@ CloudDiff.Diff = class {
 		}
 		else {
 			// External diff.
-			let ex_data = {
+			const ex_data = {
 				sender: 'content',
 				type: 'diff',
 				left: {
@@ -211,14 +213,24 @@ CloudDiff.Diff = class {
 
 			// Even though the interaction is non-modal (e.g. the user can browse to the page again and trigger another diff),
 			// give at least some indication that we're doing something by changing the cursor to a spinner.
-			// (Though if the configured command spawns and returns immediately, the cursor won't actually change for a long enough time to be noticeable.)
-			// TODO implement a minimum 2 second waiting period
-			let $body = $(document.body).addClass('clouddiff-progress');
+			const $body = $(document.body).addClass('clouddiff-progress');
+			// Spawn two triggers, and clear busy-cursor on second trigger.
+			const cleanup = () => {
+				if (BUSY_CURSOR_IGNORE_EVENT) {
+					// Ignore first trigger.
+					BUSY_CURSOR_IGNORE_EVENT = null;
+				} else {
+					// Second trigger - restore cursor.
+					$body.removeClass('clouddiff-progress');
+				}
+			};
+			BUSY_CURSOR_IGNORE_EVENT = window.setTimeout(cleanup, 3000);
+
 			chrome.runtime.sendMessage(
 				ex_data,
 				(response) => {
 					CloudDiff.exDiffResponseHandler(response);
-					$body.removeClass('clouddiff-progress');
+					cleanup();
 				}
 			);
 		}
@@ -232,8 +244,8 @@ CloudDiff.Diff = class {
 	// Returns:
 	//  Promise({left: <CloudDiff.FileInfo>, right: <CloudDiff.FileInfo>, is_valid: <Boolean>})
 	async getFileInfos(source_element, args) {
-		let left = this.getFileInfo('left', args);
-		let right = this.getFileInfo('right', args);
+		const left = this.getFileInfo('left', args);
+		const right = this.getFileInfo('right', args);
 
 		return {
 			left,
@@ -271,13 +283,14 @@ CloudDiff.FileInfo = class {
 
 	// Augment this.name so that it is descriptive of the revision as well as unique.
 	get uniqueName() {
-		let dot = this.name.lastIndexOf('.');
-		let ext = dot == -1 ? '' : this.name.substr(dot);
-		let base = this.name.substr(0, this.name.length - ext.length);
+		const {id, name, modified} = this,
+			dot = name.lastIndexOf('.'),
+			ext = dot == -1 ? '' : name.substr(dot),
+			base = name.substr(0, name.length - ext.length);
 
 		// Append `id` to ensure uniqueness.
 		// Keep extension, in case diff tool can use it.
-		return `${base}.${this.modified}.${this.id}${ext}`
+		return `${base}.${modified}.${id}${ext}`
 			// Sanitize any characters not allowed by file-systems.
 			.replace(/[\/\?<>\\:\*\|"^]/g, '_')
 			.trim();
