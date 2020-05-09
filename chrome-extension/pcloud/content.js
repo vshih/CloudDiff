@@ -8,11 +8,24 @@ const REV_TABLE_SELECTOR = 'div.gridlist.revisions table tbody';
 
 let DIFF;
 
+// Bookmark for diff buttons.
+let $DIFF_BUTTONS;
+
 // Cache for retrieved file text.
 let ID_TEXT_MAP = {};
 
 
 // ===== Functions - markup injection.
+
+
+function onHashChange() {
+	const method = location.hash.startsWith('#page=revisions&') ? 'show' : 'hide';
+	$.fn[method].call($DIFF_BUTTONS);
+
+	if (method == 'show' && DIFF) {
+		DIFF.refreshDiffButtons();
+	}
+}
 
 
 // Insert diff buttons and handlers.
@@ -21,11 +34,12 @@ function injectDiffButtons(observer) {
 
 	if (!$header.next().is('.clouddiff-buttons')) {
 		$header.after(`
-			<div class="clouddiff-buttons">
+			<div class="clouddiff-buttons" style="display: none">
 				<button id="clouddiff-exdiff" class="clouddiff-button" disabled>Diff</button>
 				<button id="clouddiff-indiff" class="clouddiff-button" disabled>Inline</button>
 			</div>
 		`);
+		$DIFF_BUTTONS = $('.clouddiff-buttons');
 
 		// Diff button handlers.
 		$('#clouddiff-exdiff').click(function () { DIFF.diffOnClick(this) });
@@ -135,8 +149,6 @@ $(() => {
 	CloudDiff.addNewContentListener(megawrap, '.logo-place',												injectDiffButtons);
 	CloudDiff.addNewContentListener(megawrap, REV_TABLE_SELECTOR,										onRevisionsMarkup);
 
-	$(window).on('hashchange', () => {
-		DIFF.hide();
-	});
+	$(window).on('hashchange', onHashChange).trigger('hashchange');
 });
 
