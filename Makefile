@@ -10,6 +10,7 @@ INCLUDE_LIST = $(addprefix chrome-extension, $(shell cd chrome-extension; find .
 			   -name \*.swp \
 			-o -name .ignore \
 			-o -name .vagrant \
+			-o -name manifest.json \
 		\) \
 		-prune \
 	-o \
@@ -30,6 +31,8 @@ clouddiff.zip:	chrome-extension
 	@-rm -f $@
 	zip $@ $(INCLUDE_LIST)
 	@echo
+	@< chrome-extension/manifest.json jq 'delpaths([["key"]])' | zip $@	-
+	@printf '@ -\n@=chrome-extension/manifest.json\n' | zipnote -w $@
 	@ls -hl $@
 
 biggest:	clouddiff.zip

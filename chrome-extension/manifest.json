@@ -1,82 +1,82 @@
 {
-	"manifest_version": 2,
-	"name": "CloudDiff",
-	"version": "1.0.2.26",
-	"description": "Compare versions of your cloud text files in-browser or using your configured diff tool.",
-	"icons": {
-		"16": "16.png",
-		"48": "48.png",
-		"128": "128.png"
-	},
-	"author": "Victor Shih <victor.shih@gmail.com>",
-	"background": {
-		"page": "background.html",
-		"persistent": false
-	},
-	"content_scripts": [
-		{
-			"matches": [
-				"https://www.dropbox.com/history/*",
-				"https://my.pcloud.com/*"
-			],
-			"css": [
-				"lib/jquery.alertable.css",
-				"lib/codemirror-5.33.0/lib/codemirror.css",
-				"lib/codemirror-5.33.0/addon/merge/merge.css",
-				"common.css"
-			],
-			"js": [
-				"lib/jquery-3.5.0.min.js",
-				"lib/jquery.alertable.min.js",
-				"lib/js.cookie.min.js",
-				"lib/diff_match_patch.js",
-				"lib/codemirror-5.33.0/lib/codemirror.js",
-				"lib/codemirror-5.33.0/addon/merge/merge.js",
-				"common.js"
-			],
-			"run_at": "document_end"
-		},
-		{
-			"matches": [
-				"https://www.dropbox.com/history/*"
-			],
-			"css": [
-				"dropbox/content.css"
-			],
-			"js": [
-				"dropbox/Dropbox-sdk.min.js",
-				"dropbox/content.js"
-			],
-			"run_at": "document_end"
-		},
-		{
-			"matches": [
-				"https://my.pcloud.com/*"
-			],
-			"css": [
-				"pcloud/content.css"
-			],
-			"js": [
-				"pcloud/content.js"
-			],
-			"run_at": "document_end"
-		}
-	],
-	"content_security_policy": "default-src 'self'",
-	"minimum_chrome_version": "35.0.0.0",
-	"offline_enabled": false,
-	"options_page": "options.html",
-	"permissions": [
-		"https://my.pcloud.com/*",
-		"https://www.dropbox.com/history/*",
-
-		"nativeMessaging",
-		"storage"
-	],
-	"short_name": "CloudDiff",
-	"web_accessible_resources": [
-		"dropbox/content-inject.js",
-		"dropbox/oauth-receiver.html",
-		"dropbox/oauth-receiver.js"
-	]
+  "manifest_version": 2,
+  "name": "CloudDiff",
+  "version": "1.0.2.26",
+  "description": "Compare versions of your cloud text files in-browser or using your configured diff tool.",
+  "icons": {
+    "16": "16.png",
+    "48": "48.png",
+    "128": "128.png"
+  },
+  "author": "Victor Shih <victor.shih@gmail.com>",
+  "background": {
+    "page": "background.html",
+    "persistent": false
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.dropbox.com/history/*",
+        "https://my.pcloud.com/*"
+      ],
+      "css": [
+        "lib/jquery.alertable.css",
+        "lib/codemirror-5.33.0/lib/codemirror.css",
+        "lib/codemirror-5.33.0/addon/merge/merge.css",
+        "common.css"
+      ],
+      "js": [
+        "lib/jquery-3.5.0.min.js",
+        "lib/jquery.alertable.min.js",
+        "lib/js.cookie.min.js",
+        "lib/diff_match_patch.js",
+        "lib/codemirror-5.33.0/lib/codemirror.js",
+        "lib/codemirror-5.33.0/addon/merge/merge.js",
+        "common.js"
+      ],
+      "run_at": "document_end"
+    },
+    {
+      "matches": [
+        "https://www.dropbox.com/history/*"
+      ],
+      "css": [
+        "dropbox/content.css"
+      ],
+      "js": [
+        "dropbox/Dropbox-sdk.min.js",
+        "dropbox/content.js"
+      ],
+      "run_at": "document_end"
+    },
+    {
+      "matches": [
+        "https://my.pcloud.com/*"
+      ],
+      "css": [
+        "pcloud/content.css"
+      ],
+      "js": [
+        "pcloud/content.js"
+      ],
+      "run_at": "document_end"
+    }
+  ],
+  "content_security_policy": "default-src 'self'",
+  "minimum_chrome_version": "35.0.0.0",
+  "offline_enabled": false,
+  "options_page": "options.html",
+  "permissions": [
+    "https://my.pcloud.com/*",
+    "https://www.dropbox.com/history/*",
+    "nativeMessaging",
+    "storage"
+  ],
+  "short_name": "CloudDiff",
+  "web_accessible_resources": [
+    "dropbox/content-inject.js",
+    "dropbox/oauth-receiver.html",
+    "dropbox/oauth-receiver.js"
+  ],
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA6A+LhktyUuLdw0ObF54TRagHx82jj4T8lJOkS8pAlfxcN+uOsdK2Nl8GCqMCjw3LP4U3Z5mQrwMpsNpkc9kJjpLdv7fqwA4ZIM6NOfJ2ri6CZ8Y7F89ke2yAPiOy9RvEhy7EwklCMJr9tY+uJX77sc2E0mH54pdm4FI0LvoQYx+LWvupOvykr3RDv+/mndpLcxuNB5OdYIwOj5OJdRrqZCI02a9X8gU6K/075M4BJW6sLqZjWhag10EkgTMo543f/guws+1xdqp/O3RBX/0RxL2Sdnsvy1859/FWCTEnaGIhr8TZy/Hnk/fVRLHmQofeAv75WG2aT8LAXnHFdlkgPQIDAQAB"
 }
