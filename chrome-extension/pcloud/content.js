@@ -86,7 +86,15 @@ async function fetchFileText() {
 	const {fileid, auth} = this.extra;
 
 	if (!(id in ID_TEXT_MAP)) {
-		ID_TEXT_MAP[id] = await $.get(computeFileUrl(fileid, id, auth));
+		const text = await $.get(computeFileUrl(fileid, id, auth));
+
+		if (id == 'Current') {
+			// Never cache the "Current" version of a file:
+			// - Cache key namespace spans multiple files (I assume that revision IDs are unique across all files).
+			// - The text of the given file might change between views.
+			return text;
+		}
+		ID_TEXT_MAP[id] = text;
 	}
 	return ID_TEXT_MAP[id];
 }
@@ -113,8 +121,8 @@ class DiffPCloud extends CloudDiff.Diff {
 // Private helper functions.
 
 function computeFileid() {
-	let match = document.location.hash.match(/fileid=(\d+)/);
-	return match ? match[1] : null;
+	const params = new URLSearchParams(location.hash.substr(1));
+	return params.get('fileid');
 }
 
 function computeAuth() {
