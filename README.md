@@ -1,5 +1,5 @@
 
-# README #
+# CloudDiff #
 
 This is the source repository for CloudDiff (formerly DropboxDiff) - https://chrome.google.com/webstore/detail/clouddiff/hlmlielnekakcdfpkbgcpnphenleogfp?hl=en-US&gl=US.
 
@@ -60,9 +60,17 @@ Please let me know if you run into any issues at http://blog.vicshih.com/2011/09
 # Development Notes #
 
 
+## Extension IDs ##
+
+- Production - `hlmlielnekakcdfpkbgcpnphenleogfp`
+- Development - `mclhnicmmbipgddnijniccihmbdlhogb`
+
+
 ## Event Sequences ##
 
+
 ### Inital page load - content script
+
 1. Script tag containing initial "revisions" rendered
 2. document.ready
     1. Parse "revisions" into REV\_MAP
@@ -73,6 +81,7 @@ Please let me know if you run into any issues at http://blog.vicshih.com/2011/09
 
 
 ### "Load older versions" clicked
+
 1. ajaxSuccess fires, with new "revisions" data in response (dropbox.com page)
     1. Send "revisions" data to content script via custom event
     2. Content script adds info to REV\_MAP
@@ -82,18 +91,15 @@ Please let me know if you run into any issues at http://blog.vicshih.com/2011/09
 
 
 ### Diff clicked
+
 1. Compute sjid from revisions table
 2. Lookup file URLs from REV\_MAP via sjids
 3. Trigger diff
 
 
 ## TODO ##
-- Extension
-  - Jump to first diff in inline diff
-  - Make "nativeMessaging" permission optional
-  - Options page
-    - File extension-specific command configuration
-  - Progress bars
+
+- [TODO.md](TODO.md)
 
 
 ## References ##

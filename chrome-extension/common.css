@@ -49,10 +49,7 @@
 	width: 100%;
 }
 
-/* Facilitate busy pointer. */
-* {
-	cursor: inherit !important;
-}
+/* Facilitate busy-cursor. */
 .clouddiff-progress {
 	cursor: progress !important;
 }
