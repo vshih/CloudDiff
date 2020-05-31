@@ -5,34 +5,13 @@
 // Must match nativeMessagingHostName in bitbucket.org/vshih/clouddiff-helper/internal/install/install.go.
 const NATIVE_MESSAGING_HOST_NAME = 'com.vicshih.clouddiff.helper';
 
-// Remember last request if configuration is still needed.
-let LAST_REQUEST;
 
 let HANDLER = {
 	diff(message, send_response) {
-		// Special handling if resuming a previous request.
-		const resume = message.resume;
-
-		if (resume) {
-			if (LAST_REQUEST) {
-				message = LAST_REQUEST.message;
-				send_response = LAST_REQUEST.send_response;
-				LAST_REQUEST = null;
-			} else {
-				// Nothing to retry.
-				send_response('OK');
-				return;
-			}
-		}
-
 		const cmd = localStorage.cmd;
 
-		if (cmd || message.sender == 'options') {
-			// Clear state in most cases.
-			LAST_REQUEST = null;
-		} else {
-			// Save the current message and trigger the Options page.
-			LAST_REQUEST = {message, send_response};
+		if (!cmd && message.sender != 'options') {
+			// Trigger the Options page.
 			chrome.tabs.create({url: 'options.html'});
 			return true;
 		}

@@ -2,7 +2,7 @@
 'use strict';
 
 
-const FLASH_TIMEOUT = 1800;
+const FLASH_TIMEOUT = 2500;
 
 
 function populateExamples() {
@@ -59,11 +59,6 @@ function saveOptions() {
 			$(this).css({visibility: 'hidden'});
 			n();
 		});
-
-	if (localStorage.cmd) {
-		// If there is a queued request, resume it.
-		chrome.runtime.sendMessage({sender: 'options', type: 'diff', resume: true});
-	}
 }
 
 
