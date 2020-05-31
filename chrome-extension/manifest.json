@@ -26,7 +26,7 @@
         "common.css"
       ],
       "js": [
-        "lib/jquery-3.5.0.min.js",
+        "lib/jquery-3.5.1.min.js",
         "lib/jquery.alertable.min.js",
         "lib/js.cookie.min.js",
         "lib/diff_match_patch.js",
