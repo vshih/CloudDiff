@@ -21,8 +21,8 @@
       ],
       "css": [
         "lib/jquery.alertable.css",
-        "lib/codemirror-5.33.0/lib/codemirror.css",
-        "lib/codemirror-5.33.0/addon/merge/merge.css",
+        "lib/codemirror-5.54.0/lib/codemirror.css",
+        "lib/codemirror-5.54.0/addon/merge/merge.css",
         "common.css"
       ],
       "js": [
@@ -30,8 +30,8 @@
         "lib/jquery.alertable.min.js",
         "lib/js.cookie.min.js",
         "lib/diff_match_patch.js",
-        "lib/codemirror-5.33.0/lib/codemirror.js",
-        "lib/codemirror-5.33.0/addon/merge/merge.js",
+        "lib/codemirror-5.54.0/lib/codemirror.js",
+        "lib/codemirror-5.54.0/addon/merge/merge.js",
         "common.js"
       ],
       "run_at": "document_end"
