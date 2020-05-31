@@ -94,6 +94,9 @@ CloudDiff.addNewContentListener = (root, targetSelector, callback) => {
 // ===== Class definitions.
 
 
+CloudDiff.IgnoreException = class extends Error {};
+
+
 CloudDiff.Diff = class {
 
 	constructor(click_listener_root) {
@@ -155,16 +158,17 @@ CloudDiff.Diff = class {
 	}
 
 	async diffOnClick(source_element) {
-		// Retrieve left and right previews.
-		const files = await this.getFileInfos(source_element, null);
+		// For retrieving the text for both files from fetch or cache.
+		let left_text, right_text, files;
 
-		if (!(files && files.is_valid)) { return }
-
-
-		// It's legit.
-		// Retrieve text for both files from cache or AJAX.
-		let left_text, right_text;
 		try {
+			// Retrieve left and right previews.
+			files = await this.getFileInfos(source_element, null);
+
+			if (!(files && files.is_valid)) { return }
+
+
+			// It's legit.
 			// Assign promises to variables before awaiting to spawn in parallel.
 			let left_fetch = files.left.fetchFileText();
 			let right_fetch = files.right.fetchFileText();
@@ -172,8 +176,11 @@ CloudDiff.Diff = class {
 			right_text = await right_fetch;
 		}
 		catch (err) {
-			return CloudDiff.alert(`CloudDiff failed with the following error
-				(the JavaScript console of CloudDiff's background page may have more information):`, err);
+			if (!(err instanceof CloudDiff.IgnoreException)) {
+				CloudDiff.alert(`CloudDiff failed with the following error
+					(the JavaScript console of CloudDiff's background page may have more information):`, err);
+			}
+			return;
 		}
 
 		if (source_element.id === 'clouddiff-indiff') {
@@ -184,8 +191,8 @@ CloudDiff.Diff = class {
 				files.right.label
 			);
 			CodeMirror.MergeView(this.$content[0], {
-				// Potential options for configurability.
 				// TODO scroll to first diff
+				// Potential options for configurability.
 				//connect: 'align' | '',
 				//collapseIdentical: true | false | integer,
 				//lineWrapping: bool,

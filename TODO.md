@@ -1,7 +1,6 @@
 
 # TODO
 
-- Handle Dropbox OAuth token expiration
 - Jump to first diff in inline diff
 - Make "nativeMessaging" permission optional
 - Options page
@@ -26,6 +25,7 @@
 
 ## Done
 
+- ~~Handle Dropbox OAuth token expiration~~
 - ~~Fix busy-cursor~~
 - ~~pCloud~~
     - ~~Fix external diff parameters~~

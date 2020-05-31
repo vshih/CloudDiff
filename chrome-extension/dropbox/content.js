@@ -1,11 +1,15 @@
 
 'use strict';
 
+
 // ===== Globals/bookmarks.
 
 const APP_KEY = 'j9zuibfjn4j82u4';
 
 let DIFF;
+
+// Authenticated dbx instance.
+let DBX;
 
 // Root node of the revisions-list markup.
 let $REV_DIV;
@@ -24,9 +28,6 @@ let TS_REV_MAP;
 
 // Map revision to cached file text.
 let REV_TEXT_MAP = {};
-
-// Queue the element which triggered a diff, if necessary.
-let LAST_SOURCE_ELEMENT;
 
 
 // ===== Functions - markup injection and extraction.
@@ -96,13 +97,16 @@ function injectRadioButtons(observer) {
 }
 
 
-function accessTokenChanged(changes, namespace) {
-	if (namespace == 'sync' && changes.accessToken && LAST_SOURCE_ELEMENT) {
-		DIFF.diffOnClick(LAST_SOURCE_ELEMENT);
+function accessTokenChanged(changes) {
+	if (changes.context && changes.context.newValue) {
+		DIFF.diffOnClick({
+			id: changes.context.newValue.value.source_id
+		});
 	}
 }
 
 
+// Make access token retrieval awaitable.
 function getAccessToken() {
 	return new Promise(function (resolve, reject) {
 		chrome.storage.sync.get('accessToken', function (result) {
@@ -112,51 +116,82 @@ function getAccessToken() {
 }
 
 
+function triggerAuth(context) {
+	let dbx = new Dropbox.Dropbox({clientId: APP_KEY, fetch: window.fetch}),
+		receiver_path = chrome.runtime.getURL('dropbox/oauth-receiver.html'),
+		auth_url = dbx.getAuthenticationUrl(receiver_path, JSON.stringify(context));
+	window.open(auth_url, 'clouddiff-dropbox-oauth');
+}
+
+
+// Unify all dbx call/error handling.
+async function dbxCall(callback, context) {
+	try {
+		if (!DBX) {
+			const access_token = await getAccessToken();
+			// If empty, treat like access token is expired.
+			if (!access_token) { throw {status: 401} }
+			DBX = new Dropbox.Dropbox({accessToken: access_token, fetch: window.fetch});
+		}
+
+		return await callback(DBX);
+	}
+	catch (err) {
+		if (err.status == 401) {
+			DBX = null;
+			triggerAuth(context);
+			// Unwind stack but don't alert.
+			throw new CloudDiff.IgnoreException();
+		}
+		throw err;
+	}
+}
+
+
 // ===== Interface implementation.
 
+// FileInfo method implementation.
 async function fetchFileText() {
-	const {dbx, rev} = this.extra;
+	const {rev, context} = this.extra;
 
 	if (!(rev in REV_TEXT_MAP)) {
 		// Download file.
-		let file_meta = await dbx.filesDownload({path: `rev:${rev}`});
-		REV_TEXT_MAP[rev] = await file_meta.fileBlob.text();
+		REV_TEXT_MAP[rev] = await dbxCall(
+			async (dbx) => {
+				let file_meta = await dbx.filesDownload({path: `rev:${rev}`});
+				return await file_meta.fileBlob.text();
+			},
+			context
+		);
 	}
 	return REV_TEXT_MAP[rev];
 }
 
+
 class DiffDropbox extends CloudDiff.Diff {
 	async getFileInfos(source_element, args) {
-		const access_token = await getAccessToken();
+		// Construct a context object in case we need to resume flow.
+		const context = {
+			source_id: source_element.id
+		};
 
-		if (access_token) {
-			LAST_SOURCE_ELEMENT = null;
-		} else {
-			LAST_SOURCE_ELEMENT = source_element;
-
-			// Trigger OAuth flow.
-			let dbx = new Dropbox.Dropbox({clientId: APP_KEY, fetch: window.fetch}),
-				receiver_path = chrome.runtime.getURL('dropbox/oauth-receiver.html'),
-				auth_url = dbx.getAuthenticationUrl(receiver_path);
-			window.open(auth_url, '_blank');
-			return null;
-		}
-
-		// Retrieve revisions for the current file.
-		let dbx = new Dropbox.Dropbox({accessToken: access_token, fetch: window.fetch});
 		if (!TS_REV_MAP) {
+			// Retrieve revisions for the current file.
+			const revisions = await dbxCall(
+				// Note - if there are more than 100 revisions, we're out of luck.
+				(dbx) => dbx.filesListRevisions({path: FQ_PATH, mode: {'.tag': 'path'}, limit: 100}),
+				context
+			);
 			TS_REV_MAP = {};
-
-			const revisions = await dbx.filesListRevisions({path: FQ_PATH, mode: {'.tag': 'path'}, limit: 100});
 			revisions.entries.forEach(entry => {
 				TS_REV_MAP[new Date(entry.server_modified).getTime()] = entry.rev;
 			});
 		}
 
-		return super.getFileInfos(source_element, {dbx});
+		return super.getFileInfos(source_element, context);
 	}
 
-	getFileInfo(left_or_right, {dbx}) {
+	getFileInfo(left_or_right, context) {
 		const $row = $REV_DIV.find(`input[name=diff-${left_or_right}]`).filter(':checked').closest('li');
 		if ($row.length != 1) { return null }
 
@@ -166,10 +201,7 @@ class DiffDropbox extends CloudDiff.Diff {
 
 		const rev = TS_REV_MAP[ts],
 			modified = $row.find('.file-revisions__text--time').text().trim(),
-			extra = {
-				dbx,
-				rev
-			};
+			extra = {rev, context};
 		return new CloudDiff.FileInfo(FILENAME, modified, sjid, fetchFileText, extra);
 	}
 }
@@ -232,7 +264,7 @@ $(() => {
 	CloudDiff.addNewContentListener(document.body, 'script:contains(\'"revisions":\')',	initRevInfo);
 
 	// Listen for OAuth token in storage.
-	chrome.storage.onChanged.addListener(accessTokenChanged);
+	chrome.storage.sync.onChanged.addListener(accessTokenChanged);
 
 	$(embedded_app)
 		.on('click', '.clouddiff-selectors', (ev) => {
