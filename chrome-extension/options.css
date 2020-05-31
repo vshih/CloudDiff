@@ -50,3 +50,10 @@ p, h4 { font-size: 12pt }
 li, a, label { font-size: 11pt }
 i { font-size: 10pt }
 
+
+/* Buy Me A Coffee */
+.bmc-button {
+	height: 42px !important;
+	width: 181px !important;
+}
+
