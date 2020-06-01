@@ -2,4 +2,5 @@
 *.swp
 *.svn
 *.zip
+/.envrc
 /test/chrome-extension/

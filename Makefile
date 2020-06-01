@@ -1,4 +1,7 @@
 
+.PHONY:	clouddiff.zip
+
+
 help:
 	@echo Available targets: help zip
 
@@ -31,8 +34,8 @@ clouddiff.zip:	chrome-extension
 	@-rm -f $@
 	zip $@ $(INCLUDE_LIST)
 	@echo
-	@< chrome-extension/manifest.json jq 'delpaths([["key"]])' | zip $@	-
-	@printf '@ -\n@=chrome-extension/manifest.json\n' | zipnote -w $@
+	@< chrome-extension/manifest.json jq 'delpaths([["key"]])' | zip $@ -
+	printf '@ -\n@=chrome-extension/manifest.json\n' | zipnote -w $@
 	@ls -hl $@
 
 biggest:	clouddiff.zip
