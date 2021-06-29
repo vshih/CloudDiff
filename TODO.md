@@ -25,6 +25,7 @@
 
 ## Done
 
+- ~~Simplify busy pointer~~
 - ~~Handle Dropbox OAuth token expiration~~
 - ~~Fix busy-cursor~~
 - ~~pCloud~~

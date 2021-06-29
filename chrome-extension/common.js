@@ -8,9 +8,6 @@
 
 let CloudDiff = {};
 
-// For busy-cursor minimum timeout.
-let BUSY_CURSOR_IGNORE_EVENT;
-
 
 // ===== Static methods.
 
@@ -218,26 +215,13 @@ CloudDiff.Diff = class {
 				}
 			};
 
-			// Even though the interaction is non-modal (e.g. the user can browse to the page again and trigger another diff),
-			// give at least some indication that we're doing something by changing the cursor to a spinner.
 			const $body = $(document.body).addClass('clouddiff-progress');
-			// Spawn two triggers, and clear busy-cursor on second trigger.
-			const cleanup = () => {
-				if (BUSY_CURSOR_IGNORE_EVENT) {
-					// Ignore first trigger.
-					BUSY_CURSOR_IGNORE_EVENT = null;
-				} else {
-					// Second trigger - restore cursor.
-					$body.removeClass('clouddiff-progress');
-				}
-			};
-			BUSY_CURSOR_IGNORE_EVENT = window.setTimeout(cleanup, 3000);
+			window.setTimeout(() => { $body.removeClass('clouddiff-progress') }, 3000);
 
 			chrome.runtime.sendMessage(
 				ex_data,
 				(response) => {
 					CloudDiff.exDiffResponseHandler(response);
-					cleanup();
 				}
 			);
 		}
