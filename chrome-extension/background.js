@@ -57,7 +57,7 @@ let HANDLER = {
 function init() {
 	// Set up message listener.
 	chrome.runtime.onMessage.addListener((message, sender, send_response) => {
-		HANDLER[message.type].call(HANDLER, message, send_response);
+		return HANDLER[message.type].call(HANDLER, message, send_response);
 	});
 }
 
