@@ -177,6 +177,9 @@ class DiffDropbox extends CloudDiff.Diff {
 
 		if (!TS_REV_MAP) {
 			// Retrieve revisions for the current file.
+			if (typeof FQ_PATH == 'undefined') {
+				throw 'Failed to compute current file path';
+			}
 			const revisions = await dbxCall(
 				// Note - if there are more than 100 revisions, we're out of luck.
 				(dbx) => dbx.filesListRevisions({path: FQ_PATH, mode: {'.tag': 'path'}, limit: 100}),
