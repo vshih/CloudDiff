@@ -5,6 +5,19 @@
 const FLASH_TIMEOUT = 2500;
 
 
+// Show feedback.
+function flash(msg) {
+	$('#flash')
+		.html(msg)
+		.css({visibility: 'visible'})
+		.delay(FLASH_TIMEOUT)
+		.queue(function (n) {
+			$(this).css({visibility: 'hidden'});
+			n();
+		});
+}
+
+
 function populateExamples() {
 	let appVersion = navigator.appVersion;
 
@@ -40,25 +53,22 @@ function populateExamples() {
 }
 
 
-// Read from localStorage.
+// Read from storage.
 function restoreOptions() {
 	$('#cmd').val(localStorage.cmd || '');
 	$('#ignore-exit').prop('checked', localStorage.ignoreExit === 'on');
+	chrome.storage.sync.get('accessToken', (result) => {
+		if (result.accessToken) {
+			$('#clear-dropbox-auth').prop('disabled', false);
+		}
+	});
 }
 
 
 function saveOptions() {
 	localStorage.cmd = $('#cmd').val();
 	localStorage.ignoreExit = $('#ignore-exit').is(':checked') ? 'on' : '';
-
-	// Show feedback.
-	$('#saved')
-		.css({visibility: 'visible'})
-		.delay(FLASH_TIMEOUT)
-		.queue(function (n) {
-			$(this).css({visibility: 'hidden'});
-			n();
-		});
+	flash('Saved.');
 }
 
 
@@ -122,6 +132,18 @@ sunt in culpa qui officia deserunt mollit anim id est laborum.
 }
 
 
+function clearAuth() {
+	$('#clear-dropbox-auth').prop('disabled', true);
+	chrome.storage.sync.remove('accessToken', () => {
+		if (chrome.runtime.lastError) {
+			flash('Error: ' + chrome.runtime.lastError);
+		} else {
+			flash('Cleared.');
+		}
+	});
+}
+
+
 function registerListeners() {
 	// Links to blog.
 	$('#blog-link').click(function () {
@@ -136,6 +158,9 @@ function registerListeners() {
 
 	// Test button.
 	$('#config-test').click(testConfig);
+
+	// Clear-auth button.
+	$('#clear-dropbox-auth').click(clearAuth);
 }
 
 

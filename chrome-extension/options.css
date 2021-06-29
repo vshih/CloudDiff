@@ -17,8 +17,8 @@ li { line-height: 22pt }
 a { text-decoration: none }
 a:hover { text-decoration: underline }
 
-#flash { text-align: center }
-#saved { background-color: yellow; padding: 7px 11px 7px 14px; border-radius: 8px; visibility: hidden }
+#flash-box { text-align: center }
+#flash { background-color: yellow; padding: 7px 11px 7px 14px; border-radius: 8px; visibility: hidden }
 
 #margin { padding: 0 30px 0 20px; width: 232px }
 #blog-link { cursor: pointer }
@@ -30,19 +30,22 @@ a:hover { text-decoration: underline }
 	border-left: 1px dotted gray;
 	height: 90%;
 }
+#content > div { margin-top: 15px }
 
-.clear { clear: both; padding: 10px }
+label > img { margin-left: 3px }
+
+button { padding: 5px 20px }
 
 #examples code { border-radius: 3px; display: block; margin: 8px; padding: 1px 6px }
 
 #cmd-box { margin-top: 22px }
 
-#cmd-label, #ignore-margin { display: inline-block; width: 100px }
-#ignore-box { display: inline-block; margin-top: 8px }
+#cmd-label, #ignore-exit-margin { display: inline-block; width: 100px }
+#ignore-exit-label { margin-top: 15px }
 
 #cmd { width: 550px }
 
-#config-test { padding: 5px 20px; position: relative; top: -2px }
+#config-test { position: relative; top: -2px }
 
 /* Font sizing */
 h3, input { font-size: 13pt }

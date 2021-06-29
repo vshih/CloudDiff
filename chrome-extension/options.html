@@ -9,8 +9,8 @@
 <base target="_blank">
 </head>
 <body>
-<div id="flash">
-	<span id="saved">Saved.</span>
+<div id="flash-box">
+	<span id="flash"></span>
 </div>
 <div id="margin">
 	<div id="blog-link">
@@ -54,11 +54,16 @@
 		<input type="text" id="cmd"/>
 		<button id="config-test">Test</button>
 	</div>
-	<div id="ignore-margin"></div>
-	<div id="ignore-box">
-		<label id="ignore-label" for="ignore-exit" title="Some programs like KDiff3 return errors even on success; select this option to ignore any error codes.">
+	<div id="ignore-exit-box">
+		<div id="ignore-exit-margin"></div>
+		<label id="ignore-exit-label" for="ignore-exit">
 			<input type="checkbox" id="ignore-exit"> Ignore exit status
+			<img src="question-circle.svg" title="Some programs like KDiff3 return errors even on success; select this option to ignore any error codes.">
 		</label>
+	</div>
+	<div id="clear-dropbox-auth-box">
+		<button id="clear-dropbox-auth" disabled>Clear Dropbox authorization</button>
+	</div>
 </div>
 </body>
 </html>
