@@ -157,7 +157,7 @@ async function fetchFileText() {
 	if (!(rev in REV_TEXT_MAP)) {
 		// Download file.
 		REV_TEXT_MAP[rev] = await dbxCall(
-			async (dbx) => {
+			async dbx => {
 				let file_meta = await dbx.filesDownload({path: `rev:${rev}`});
 				return await file_meta.fileBlob.text();
 			},
@@ -182,7 +182,7 @@ class DiffDropbox extends CloudDiff.Diff {
 			}
 			const revisions = await dbxCall(
 				// Note - if there are more than 100 revisions, we're out of luck.
-				(dbx) => dbx.filesListRevisions({path: FQ_PATH, mode: {'.tag': 'path'}, limit: 100}),
+				dbx => dbx.filesListRevisions({path: FQ_PATH, mode: {'.tag': 'path'}, limit: 100}),
 				context
 			);
 			TS_REV_MAP = {};
@@ -255,24 +255,24 @@ function onRevisionsMarkup(observer) {
 $(() => {
 	CloudDiff.setPlatform();
 
-	let embedded_app = $('#embedded-app')[0];
-
-	DIFF = new DiffDropbox(embedded_app);
+	const $root = $('#embedded-app');
+	DIFF = new DiffDropbox($root[0]);
 
 	addNewRevisionsAjaxListener(onNewRevisionsJson);
 	injectScript('dropbox/content-inject.js');
 
-	CloudDiff.addNewContentListener(document.body, '.page-header__heading',							injectDiffButtons);
-	CloudDiff.addNewContentListener(document.body, '.file-revisions-page__content',			onRevisionsMarkup);
-	CloudDiff.addNewContentListener(document.body, 'script:contains(\'"revisions":\')',	initRevInfo);
+	CloudDiff.addNewContentListener(document.body, '.page-header__heading', injectDiffButtons);
+	CloudDiff.addNewContentListener(document.body, '.file-revisions-page__content', onRevisionsMarkup);
+	CloudDiff.addNewContentListener(document.body, `script:contains('"revisions":')`, initRevInfo);
 
 	// Listen for OAuth token in storage.
 	chrome.storage.sync.onChanged.addListener(accessTokenChanged);
 
-	$(embedded_app)
-		.on('click', '.clouddiff-selectors', (ev) => {
+	$('.file-revisions-page')
+		.on('click', '.clouddiff-selectors', ev => {
 			// Prevent default preview pop-up for injected elements.
 			ev.stopPropagation();
-		})
+			$root.trigger('clouddiff:click');
+		});
 });
 

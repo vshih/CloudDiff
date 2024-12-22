@@ -116,10 +116,8 @@ CloudDiff.Diff = class {
 		this.$dialog.find('.clouddiff-close').click(() => this.hide());
 		$(document).keyup(ev => { if (ev.keyCode == 27) this.hide() });
 
-		$(click_listener_root)
-			// Add diff-selector handlers.
-			.on('click', '.clouddiff-selectors input[type="radio"]', this.refreshDiffButtons)
-		;
+		// Add diff-selector handlers.
+		$(click_listener_root).on('clouddiff:click', this.refreshDiffButtons);
 	}
 
 	show(left_label, right_label) {
