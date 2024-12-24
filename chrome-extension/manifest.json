@@ -1,5 +1,5 @@
 {
-  "manifest_version": 2,
+  "manifest_version": 3,
   "name": "CloudDiff",
   "version": "1.0.2.28",
   "description": "Compare versions of your cloud text files in-browser or using your configured diff tool.",
@@ -62,21 +62,34 @@
       "run_at": "document_end"
     }
   ],
-  "content_security_policy": "default-src 'self'; img-src 'self' https://cdn.buymeacoffee.com",
+  "content_security_policy": {
+		"extension_pages": "default-src 'self'; img-src 'self' https://cdn.buymeacoffee.com"
+	},
   "minimum_chrome_version": "35.0.0.0",
   "offline_enabled": false,
   "options_page": "options.html",
   "permissions": [
-    "https://my.pcloud.com/*",
-    "https://www.dropbox.com/history/*",
     "nativeMessaging",
     "storage"
   ],
   "short_name": "CloudDiff",
   "web_accessible_resources": [
-    "dropbox/content-inject.js",
-    "dropbox/oauth-receiver.html",
-    "dropbox/oauth-receiver.js"
-  ],
+		{
+			"matches": [
+        "https://www.dropbox.com/*"
+			],
+			"resources": [
+				"dropbox/*"
+			]
+		},
+		{
+			"matches": [
+        "https://my.pcloud.com/*"
+			],
+			"resources": [
+				"pcloud/*"
+			]
+		}
+	],
   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA6A+LhktyUuLdw0ObF54TRagHx82jj4T8lJOkS8pAlfxcN+uOsdK2Nl8GCqMCjw3LP4U3Z5mQrwMpsNpkc9kJjpLdv7fqwA4ZIM6NOfJ2ri6CZ8Y7F89ke2yAPiOy9RvEhy7EwklCMJr9tY+uJX77sc2E0mH54pdm4FI0LvoQYx+LWvupOvykr3RDv+/mndpLcxuNB5OdYIwOj5OJdRrqZCI02a9X8gU6K/075M4BJW6sLqZjWhag10EkgTMo543f/guws+1xdqp/O3RBX/0RxL2Sdnsvy1859/FWCTEnaGIhr8TZy/Hnk/fVRLHmQofeAv75WG2aT8LAXnHFdlkgPQIDAQAB"
 }
