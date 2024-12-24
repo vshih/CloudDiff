@@ -1,8 +1,13 @@
 
 # TODO
 
-- Jump to first diff in inline diff
+- Upgrade and annotate Dropbox-SDK version (currently https://github.com/dropbox/dropbox-sdk-js/releases/tag/v4.0.30)
+    - Update auth to implement PKCE and downgrade from implicit grant
+        - https://developers.dropbox.com/oauth-guide
+        - https://github.com/dropbox/dropbox-sdk-js/blob/main/examples/javascript/pkce-browser/index.html
+- Upgrade jQuery
 - Make "nativeMessaging" permission optional
+- Jump to first diff in inline diff
 - Options page
     - File extension-specific command configuration
 - Progress bars
@@ -25,6 +30,10 @@
 
 ## Done
 
+- ~~Redirect clouddiff.vicshih.com over HTTPS~~
+    - [x] ~~Back to nearlyfreespeech.net? - $3.65/yr~~
+    - ~~Namecheap.com shared hosting - $18.96-$22.56/yr~~
+    - ~~https://go.vicshih.com/3xiVh3Y ?~~
 - ~~Button to clear auth~~
 - ~~Simplify busy pointer~~
 - ~~Handle Dropbox OAuth token expiration~~
