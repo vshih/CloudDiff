@@ -216,7 +216,7 @@ class DiffDropbox extends CloudDiff.Diff {
 // From https://stackoverflow.com/a/9517879/97439, method 1.
 function injectScript(script) {
 	let scriptElement = document.createElement('script');
-	scriptElement.src = chrome.extension.getURL(script);
+	scriptElement.src = chrome.runtime.getURL(script);
 	scriptElement.onload = function () {
 		this.remove();
 	};

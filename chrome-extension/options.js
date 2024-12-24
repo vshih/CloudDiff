@@ -27,7 +27,7 @@ function populateExamples() {
 		eg = [
 			`opendiff`,
 			`/Applications/p4merge.app/Contents/Resources/launchp4merge`,
-			`/usr/local/bin/mvim -d`,
+			`/Applications/MacVim.app/Contents/bin/mvim -d`,
 			`open https://diffy.org$(git diff $1 $2 | curl -is https://diffy.org/new -F 'udiff=<-' | awk -F' to ' '/^Found/ {col = 2; print $col}')`,
 			`git diff $1 $2 | /usr/local/bin/node /usr/local/bin/diff2html -i stdin`,
 		];
@@ -55,10 +55,15 @@ function populateExamples() {
 
 // Read from storage.
 function restoreOptions() {
-	$('#cmd').val(localStorage.cmd || '');
-	$('#ignore-exit').prop('checked', localStorage.ignoreExit === 'on');
-	chrome.storage.sync.get('accessToken', (result) => {
-		if (result.accessToken) {
+	chrome.storage.local.get({cmd: '', ignoreExit: ''})
+	.then(({ cmd, ignoreExit }) => {
+		$('#cmd').val(cmd);
+		$('#ignore-exit').prop('checked', ignoreExit === 'on');
+	});
+
+	chrome.storage.sync.get('accessToken')
+	.then(({ accessToken }) => {
+		if (accessToken) {
 			$('#clear-dropbox-auth').prop('disabled', false);
 		}
 	});
@@ -66,9 +71,11 @@ function restoreOptions() {
 
 
 function saveOptions() {
-	localStorage.cmd = $('#cmd').val();
-	localStorage.ignoreExit = $('#ignore-exit').is(':checked') ? 'on' : '';
-	flash('Saved.');
+	chrome.storage.local.set({
+		cmd: $('#cmd').val(),
+		ignoreExit: $('#ignore-exit').is(':checked') ? 'on' : '',
+	})
+	.then(() => flash('Saved.'));
 }
 
 
@@ -128,13 +135,13 @@ sunt in culpa qui officia deserunt mollit anim id est laborum.
 		}
 	};
 
-	chrome.extension.sendMessage(ex_data, CloudDiff.exDiffResponseHandler);
+	chrome.runtime.sendMessage(ex_data, CloudDiff.exDiffResponseHandler);
 }
 
 
 function clearAuth() {
 	$('#clear-dropbox-auth').prop('disabled', true);
-	chrome.storage.sync.remove('accessToken', () => {
+	chrome.storage.sync.remove('accessToken').then(() => {
 		if (chrome.runtime.lastError) {
 			flash('Error: ' + chrome.runtime.lastError);
 		} else {

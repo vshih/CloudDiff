@@ -10,8 +10,7 @@
   },
   "author": "Victor Shih <victor.shih@gmail.com>",
   "background": {
-    "page": "background.html",
-    "persistent": false
+    "service_worker": "service-worker.js"
   },
   "content_scripts": [
     {
@@ -65,7 +64,7 @@
   "content_security_policy": {
 		"extension_pages": "default-src 'self'; img-src 'self' https://cdn.buymeacoffee.com"
 	},
-  "minimum_chrome_version": "35.0.0.0",
+  "minimum_chrome_version": "88.0.0.0",
   "offline_enabled": false,
   "options_page": "options.html",
   "permissions": [

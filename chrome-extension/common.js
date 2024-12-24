@@ -32,7 +32,7 @@ CloudDiff.alert = (s, obj) => {
 };
 
 
-CloudDiff.exDiffResponseHandler = (response) => {
+CloudDiff.exDiffResponseHandler = response => {
 	switch (response) {
 		case 'OK':
 		case undefined:
@@ -48,7 +48,7 @@ CloudDiff.exDiffResponseHandler = (response) => {
 
 			CloudDiff.alert(`
 				CloudDiff failed with the message below${context_message}.
-				The JavaScript console of CloudDiff's background page may have more information.`, response);
+				The Console of CloudDiff's service worker may have more information.`, response);
 			break;
 	}
 };
@@ -218,7 +218,7 @@ CloudDiff.Diff = class {
 
 			chrome.runtime.sendMessage(
 				ex_data,
-				(response) => {
+				response => {
 					CloudDiff.exDiffResponseHandler(response);
 				}
 			);

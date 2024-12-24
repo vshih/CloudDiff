@@ -30,15 +30,13 @@ a:hover { text-decoration: underline }
 	border-left: 1px dotted gray;
 	height: 90%;
 }
-#content > div { margin-top: 15px }
+#content > div { margin-top: 22px }
 
 label > img { margin-left: 3px }
 
 button { padding: 5px 20px }
 
 #examples code { border-radius: 3px; display: block; margin: 8px; padding: 1px 6px }
-
-#cmd-box { margin-top: 22px }
 
 #cmd-label, #ignore-exit-margin { display: inline-block; width: 100px }
 #ignore-exit-label { margin-top: 15px }

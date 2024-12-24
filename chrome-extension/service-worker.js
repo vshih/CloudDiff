@@ -5,15 +5,14 @@
 // Must match nativeMessagingHostName in bitbucket.org/vshih/clouddiff-helper/internal/install/install.go.
 const NATIVE_MESSAGING_HOST_NAME = 'com.vicshih.clouddiff.helper';
 
-
-let HANDLER = {
-	diff(message, send_response) {
-		const cmd = localStorage.cmd;
+const HANDLER = {
+	diff(options, message, send_response) {
+		const { cmd, ignoreExit } = options;
 
 		if (!cmd && message.sender != 'options') {
 			// Trigger the Options page.
 			chrome.tabs.create({url: 'options.html'});
-			return true;
+			return send_response('OK');
 		}
 
 		chrome.runtime.sendNativeMessage(
@@ -23,7 +22,7 @@ let HANDLER = {
 				left: message.left,
 				right: message.right
 			},
-			(response) => {
+			response => {
 				if (response) {
 					console.log(response);
 
@@ -32,8 +31,8 @@ let HANDLER = {
 						send_response('OK');
 					}
 					else {
-						if (localStorage.ignoreExit) {
-							console.log("Non-zero exit status ignored.");
+						if (ignoreExit) {
+							console.log(`Non-zero (${response.ExitStatus}) exit status; ignored.`);
 							send_response('OK');
 						}
 						else {
@@ -47,9 +46,6 @@ let HANDLER = {
 				}
 			}
 		);
-
-		// Response is fired upon completion of sendNativeMessage; return `true` to signal asynchronous response.
-		return true;
 	}
 };
 
@@ -57,7 +53,12 @@ let HANDLER = {
 function init() {
 	// Set up message listener.
 	chrome.runtime.onMessage.addListener((message, sender, send_response) => {
-		return HANDLER[message.type].call(HANDLER, message, send_response);
+		chrome.storage.local.get(['cmd', 'ignoreExit']).then(options => {
+			return HANDLER[message.type](options, message, send_response);
+		});
+
+		// Indicate asynchronous response.
+		return true;
 	});
 }
 
