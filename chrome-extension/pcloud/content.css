@@ -4,9 +4,25 @@
 	z-index: 1900;
 }
 
+/* Hide all controls by default. */
+html .clouddiff-buttons,
+html .clouddiff-th,
+html .clouddiff-selectors
+{
+	display: none;
+}
+
+/* Show controls in a page-revisions page. */
+html.page-revisions .clouddiff-buttons {
+	display: flex;
+}
+html.page-revisions .clouddiff-th,
+html.page-revisions .clouddiff-selectors {
+	display: block;
+}
+
 .clouddiff-buttons {
-	float: left;
-	line-height: 60px;
+	display: flex;
 }
 .clouddiff-button {
 	color: #2a2a2b;
@@ -16,12 +32,11 @@
 }
 
 /* For the injected radio buttons' header, container. */
-.gridlist .clouddiff-th {
+.listGridWindow .clouddiff-th {
+	font-size: var(--small-font-size);
+	line-height: 16px;
 	text-align: center;
-}
-/* Disable highlight on hover for clouddiff-th. */
-.gridlist .clouddiff-th:hover {
-	background-color: #f4f4f4;
+	width: 80px;
 }
 .clouddiff-selectors {
 	padding-left: 0;

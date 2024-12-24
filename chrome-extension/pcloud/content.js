@@ -4,12 +4,9 @@
 
 // ===== Globals/bookmarks.
 
-const REV_TABLE_SELECTOR = 'div.gridlist.revisions table tbody';
+const REV_TABLE_SELECTOR = '.listGridWindow';
 
 let DIFF;
-
-// Bookmark for diff buttons.
-let $DIFF_BUTTONS;
 
 // Cache for retrieved file text.
 let ID_TEXT_MAP = {};
@@ -18,35 +15,20 @@ let ID_TEXT_MAP = {};
 // ===== Functions - markup injection.
 
 
-function onHashChange() {
-	const method = location.hash.startsWith('#page=revisions&') ? 'show' : 'hide';
-	$.fn[method].call($DIFF_BUTTONS);
-
-	if (method == 'show' && DIFF) {
-		DIFF.refreshDiffButtons();
-	}
-}
-
-
 // Insert diff buttons and handlers.
 function injectDiffButtons(observer) {
-	let $header = $(this);
+	observer.disconnect();
 
-	if (!$header.next().is('.clouddiff-buttons')) {
-		$header.after(`
-			<div class="clouddiff-buttons" style="display: none">
-				<button id="clouddiff-exdiff" class="clouddiff-button" disabled>Diff</button>
-				<button id="clouddiff-indiff" class="clouddiff-button" disabled>Inline</button>
-			</div>
-		`);
-		$DIFF_BUTTONS = $('.clouddiff-buttons');
+	$(this).before(`
+		<div class="clouddiff-buttons">
+			<button id="clouddiff-exdiff" class="clouddiff-button" disabled>Diff</button>
+			<button id="clouddiff-indiff" class="clouddiff-button" disabled>Inline</button>
+		</div>
+	`);
 
-		// Diff button handlers.
-		$('#clouddiff-exdiff').click(function () { DIFF.diffOnClick(this) });
-		$('#clouddiff-indiff').click(function () { DIFF.diffOnClick(this) });
-	}
-
-	observer.takeRecords();
+	// Diff button handlers.
+	$('#clouddiff-exdiff').click(function () { DIFF.diffOnClick(this) });
+	$('#clouddiff-indiff').click(function () { DIFF.diffOnClick(this) });
 }
 
 
@@ -54,8 +36,8 @@ function injectTableHeader(observer) {
 	let $thead = $(this);
 
 	if (!$thead.find('.clouddiff-th').length) {
-		$thead.find('tr').prepend(`
-			<th class="clouddiff-th">CloudDiff</th>
+		$thead.prepend(`
+			<div class="clouddiff-th"><span>CloudDiff</span></div>
 		`);
 	}
 
@@ -64,16 +46,30 @@ function injectTableHeader(observer) {
 
 
 function onRevisionsMarkup(observer) {
-	$(this).find('tr.gridline:not(:has(.clouddiff-selectors))').prepend(`
-		<td class="clouddiff-selectors">
+	$(this).find('.selectable:not(:has(.clouddiff-selectors))').prepend(`
+		<div class="clouddiff-selectors">
 			<label>
 				<input type="radio" name="diff-left" title="left side"/>
 			</label>
 			<label>
 				<input type="radio" name="diff-right" title="right side"/>
 			</label>
-		</td>
+		</div>
 	`);
+
+	const interceptorSentinel = 'clouddiff-click-interceptor',
+		$revTable = $(REV_TABLE_SELECTOR);
+
+	if (!$revTable.data(interceptorSentinel)) {
+		$revTable
+			.on('click', '.clouddiff-selectors', ev => {
+				// Prevent row-selection when clicking injected elements.
+				ev.stopPropagation();
+				$('.megawrap').trigger('clouddiff:click');
+			})
+			.data(interceptorSentinel, true)
+		;
+	}
 
 	observer.takeRecords();
 }
@@ -101,14 +97,14 @@ async function fetchFileText() {
 
 class DiffPCloud extends CloudDiff.Diff {
 	getFileInfo(left_or_right, args) {
-		const $row = $(REV_TABLE_SELECTOR).find(`input[name=diff-${left_or_right}]`).filter(':checked').closest('tr');
+		const $row = $(REV_TABLE_SELECTOR).find(`input[name=diff-${left_or_right}]`).filter(':checked').closest('div.selectable');
 		if ($row.length != 1) { return null }
 
 		const auth = computeAuth(),
 			fileid = computeFileid(),
-			file = $row.find('.filename').text(),
-			created = $row.find('td:last-child').text().trim(),
-			revision = $row.find('.revid').text(),
+			file = $row.find('.nameSub-col > span').text(),
+			created = $row.find('.created-col > span').text().trim(),
+			revision = $row.find('.revisionid-col > span').text(),
 			extra = {
 				fileid,
 				auth,
@@ -149,14 +145,12 @@ function computeFileUrl(fileid, revid, auth) {
 $(() => {
 	CloudDiff.setPlatform();
 
-	let megawrap = $('.megawrap')[0];
+	const megawrap = $('.megawrap')[0];
 
 	DIFF = new DiffPCloud(megawrap);
 
-	CloudDiff.addNewContentListener(megawrap, 'div.gridlist.revisions table thead', injectTableHeader);
-	CloudDiff.addNewContentListener(megawrap, '.logo-place',												injectDiffButtons);
-	CloudDiff.addNewContentListener(megawrap, REV_TABLE_SELECTOR,										onRevisionsMarkup);
-
-	$(window).on('hashchange', onHashChange).trigger('hashchange');
+	CloudDiff.addNewContentListener(megawrap, '#uploadProgressSection', injectDiffButtons);
+	CloudDiff.addNewContentListener(megawrap, '.headerWrapper', injectTableHeader);
+	CloudDiff.addNewContentListener(megawrap, REV_TABLE_SELECTOR, onRevisionsMarkup);
 });
 
