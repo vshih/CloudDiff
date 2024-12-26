@@ -1,15 +1,9 @@
 
 # CloudDiff #
 
-This is the source repository for CloudDiff (formerly DropboxDiff) - https://chrome.google.com/webstore/detail/clouddiff/hlmlielnekakcdfpkbgcpnphenleogfp?hl=en-US&gl=US.
+This is the source repository for CloudDiff (formerly DropboxDiff).
 
 Compare versions of your Dropbox or pCloud text files in-browser or with your configured diff tool.
-
-
-## Current Version Release Notes: ##
-
-2021-06-28 update (version 1.0.2.28) - Handle Dropbox failure earlier.  Button to clear Dropbox token.
-
 
 Provides two options for comparing different versions of your Dropbox or pCloud files:  1) an external diff tool, or 2) a side-by-side diff within your browser.  This can be TortoiseMerge, KDiff3, FileMerge, or any tool which can be triggered from the command line.
 
@@ -17,7 +11,46 @@ In the "Version history" or "Revisions" page of any file, a column is added whic
 
 Supports Windows, Mac, and Linux as far as I know, though I can't be sure every possible configuration is covered.
 
-Please let me know if you run into any issues at http://blog.vicshih.com/2011/09/clouddiff-chrome-extension.html .
+Please let me know if you run into any issues at https://blog.vicshih.com/2011/09/clouddiff-chrome-extension.html .
+
+
+## Latest Release Notes: ##
+
+2024-12-25 update (version 1.0.3.1) - Update to match latest Dropbox, pCloud sites. Allow custom Dropbox app key, since the extension is no longer supported in the Chrome Web Store.
+
+
+## Installation ##
+
+This extension is no longer available in the Chrome Web Store - it violates Dropbox's terms due to how it modifies their site -
+therefore it must be installed as a unpacked extension.
+
+In addition to this, a Dropbox App is required in order to access the Dropbox API.
+
+
+### Install unpacked extension ###
+
+First, clone this repo locally, or download the ZIP.
+
+Follow the example in https://developer.chrome.com/docs/extensions/get-started/tutorial/hello-world#load-unpacked.
+Use the [/chrome-extension](https://github.com/vshih/CloudDiff/tree/master/chrome-extension) directory as the extension directory to load.
+
+Once the extension is loaded, note the ID assigned to it, visible from the "Manage Extensions" page.  It should be `mclhnicmmbipgddnijniccihmbdlhogb`.
+If for some reason it isn't, please get in contact with me.
+
+
+### Create a Dropbox App ###
+
+Browse to https://www.dropbox.com/developers/apps and click "Create app".
+
+1. For "Choose an API", select "Scoped access".
+2. For "Choose the type of access you need", select "Full Dropbox".
+3. For "Name your app", enter "CloudDiff".  Or don't, I'm not your boss.
+4. Note the "App key" generated; enter this in the extension's Options page as "Dropbox app key".
+5. In the Settings > OAuth 2 section, add the Redirect URI `chrome-extension://mclhnicmmbipgddnijniccihmbdlhogb/dropbox/oauth-receiver.html`.
+6. In the Permissions > Individual Scopes > Files and folders, check `files.content.read`.
+7. Click Submit.
+
+With that, you should be all set.
 
 
 ## Privacy Policy ##
@@ -26,6 +59,8 @@ https://github.com/vshih/CloudDiff/blob/master/privacy-policy.md
 
 
 ## Release History ##
+
+2021-06-28 update (version 1.0.2.28) - Handle Dropbox failure earlier.  Button to clear Dropbox token.
 
 2020-06-01 update (version 1.0.2.27) - Upgrade to jQuery 3.5.1, CodeMirror 5.54.0.  Handle OAuth token expiration.  Fix pCloud caching behavior.
 
@@ -116,10 +151,10 @@ https://github.com/vshih/CloudDiff/blob/master/privacy-policy.md
 - https://codemirror.net
 - https://github.com/google/diff-match-patch
 - https://github.com/claviska/jquery-alertable
-- http://stackoverflow.com/questions/9602022/chrome-extension-retrieving-gmails-original-message
-- http://www.techtalkz.com/microsoft-office-word/172251-invoking-compare-merge-command-line.html
-- http://daviddeley.com/autohotkey/parameters/parameters.htm#WIN
-- http://ss64.com/nt/cmd.html
-- http://ss64.com/nt/start.html
-- http://www.iconarchive.com/show/aesthetica-2-icons-by-dryicons/search-icon.html
+- https://stackoverflow.com/questions/9602022/chrome-extension-retrieving-gmails-original-message
+- https://www.techtalkz.com/microsoft-office-word/172251-invoking-compare-merge-command-line.html
+- https://daviddeley.com/autohotkey/parameters/parameters.htm#WIN
+- https://ss64.com/nt/cmd.html
+- https://ss64.com/nt/start.html
+- https://www.iconarchive.com/show/aesthetica-2-icons-by-dryicons/search-icon.html
 
