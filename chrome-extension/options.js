@@ -61,8 +61,11 @@ function restoreOptions() {
 		$('#ignore-exit').prop('checked', ignoreExit === 'on');
 	});
 
-	chrome.storage.sync.get('accessToken')
-	.then(({ accessToken }) => {
+	chrome.storage.sync.get(['appKey', 'accessToken'])
+	.then(({ appKey, accessToken }) => {
+		if (appKey) {
+			$('#dropbox-app-key').val(appKey);
+		}
 		if (accessToken) {
 			$('#clear-dropbox-auth').prop('disabled', false);
 		}
@@ -71,10 +74,15 @@ function restoreOptions() {
 
 
 function saveOptions() {
-	chrome.storage.local.set({
-		cmd: $('#cmd').val(),
-		ignoreExit: $('#ignore-exit').is(':checked') ? 'on' : '',
-	})
+	Promise.all([
+		chrome.storage.local.set({
+			cmd: $('#cmd').val(),
+			ignoreExit: $('#ignore-exit').is(':checked') ? 'on' : '',
+		}),
+		chrome.storage.sync.set({
+			appKey: $('#dropbox-app-key').val(),
+		}),
+	])
 	.then(() => flash('Saved.'));
 }
 
@@ -161,7 +169,7 @@ function registerListeners() {
 	$(document.body).on('click', 'code', selectCodeBlockOnClick);
 
 	// Set up change handlers.
-	$('#cmd, #ignore-exit').change(saveOptions);
+	$('#cmd, #ignore-exit, #dropbox-app-key').change(saveOptions);
 
 	// Test button.
 	$('#config-test').click(testConfig);

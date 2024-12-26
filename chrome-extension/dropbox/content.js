@@ -4,6 +4,7 @@
 
 // ===== Globals/bookmarks.
 
+// Original "CloudDiff" app key - frozen to new users though.
 const APP_KEY = 'j9zuibfjn4j82u4';
 
 let DIFF;
@@ -106,18 +107,10 @@ function accessTokenChanged(changes) {
 }
 
 
-// Make access token retrieval awaitable.
-function getAccessToken() {
-	return new Promise(function (resolve, reject) {
-		chrome.storage.sync.get('accessToken', function (result) {
-			resolve(result.accessToken);
-		});
-	});
-}
+async function triggerAuth(context) {
+	const clientId = (await chrome.storage.sync.get({ appKey: APP_KEY })).appKey;
 
-
-function triggerAuth(context) {
-	let dbx = new Dropbox.Dropbox({clientId: APP_KEY, fetch: window.fetch}),
+	let dbx = new Dropbox.Dropbox({ clientId, fetch: window.fetch }),
 		receiver_path = chrome.runtime.getURL('dropbox/oauth-receiver.html'),
 		auth_url = dbx.getAuthenticationUrl(receiver_path, JSON.stringify(context));
 	window.open(auth_url, 'clouddiff-dropbox-oauth');
@@ -128,7 +121,7 @@ function triggerAuth(context) {
 async function dbxCall(callback, context) {
 	try {
 		if (!DBX) {
-			const access_token = await getAccessToken();
+			const access_token = (await chrome.storage.sync.get('accessToken')).accessToken;
 			// If empty, treat like access token is expired.
 			if (!access_token) { throw {status: 401} }
 			DBX = new Dropbox.Dropbox({accessToken: access_token, fetch: window.fetch});
@@ -139,7 +132,7 @@ async function dbxCall(callback, context) {
 	catch (err) {
 		if (err.status == 401) {
 			DBX = null;
-			triggerAuth(context);
+			await triggerAuth(context);
 			// Unwind stack but don't alert.
 			throw new CloudDiff.IgnoreException();
 		}
@@ -152,13 +145,13 @@ async function dbxCall(callback, context) {
 
 // FileInfo method implementation.
 async function fetchFileText() {
-	const {rev, context} = this.extra;
+	const { rev, context } = this.extra;
 
 	if (!(rev in REV_TEXT_MAP)) {
 		// Download file.
 		REV_TEXT_MAP[rev] = await dbxCall(
 			async dbx => {
-				let file_meta = await dbx.filesDownload({path: `rev:${rev}`});
+				let file_meta = await dbx.filesDownload({ path: `rev:${rev}` });
 				return await file_meta.fileBlob.text();
 			},
 			context
