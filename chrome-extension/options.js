@@ -74,14 +74,16 @@ function restoreOptions() {
 
 
 function saveOptions() {
+	const appKey = $('#dropbox-app-key').val();
+
 	Promise.all([
 		chrome.storage.local.set({
 			cmd: $('#cmd').val(),
 			ignoreExit: $('#ignore-exit').is(':checked') ? 'on' : '',
 		}),
-		chrome.storage.sync.set({
-			appKey: $('#dropbox-app-key').val(),
-		}),
+		appKey
+			? chrome.storage.sync.set({ appKey })
+			: chrome.storage.sync.remove('appKey'),
 	])
 	.then(() => flash('Saved.'));
 }

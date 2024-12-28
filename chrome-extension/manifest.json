@@ -20,20 +20,14 @@
       ],
       "css": [
         "lib/jquery.alertable.css",
-        "lib/codemirror-5.54.0/lib/codemirror.css",
-        "lib/codemirror-5.54.0/addon/merge/merge.css",
-        "common.css"
+        "clouddiff/clouddiff.css"
       ],
       "js": [
-        "lib/jquery-3.5.1.min.js",
+        "lib/jquery.min.js",
         "lib/jquery.alertable.min.js",
-        "lib/js.cookie.min.js",
-        "lib/diff_match_patch.js",
-        "lib/codemirror-5.54.0/lib/codemirror.js",
-        "lib/codemirror-5.54.0/addon/merge/merge.js",
-        "common.js"
+        "clouddiff/index.js"
       ],
-      "run_at": "document_end"
+      "run_at": "document_start"
     },
     {
       "matches": [
@@ -43,7 +37,7 @@
         "dropbox/content.css"
       ],
       "js": [
-        "dropbox/Dropbox-sdk.min.js",
+				"dropbox/Dropbox-sdk.min.js",
         "dropbox/content.js"
       ],
       "run_at": "document_end"
@@ -56,6 +50,7 @@
         "pcloud/content.css"
       ],
       "js": [
+        "lib/js.cookie.min.js",
         "pcloud/content.js"
       ],
       "run_at": "document_end"
@@ -78,7 +73,8 @@
         "https://www.dropbox.com/*"
       ],
       "resources": [
-        "dropbox/*"
+        "dropbox/*",
+        "clouddiff/*"
       ]
     },
     {
@@ -86,7 +82,8 @@
         "https://my.pcloud.com/*"
       ],
       "resources": [
-        "pcloud/*"
+        "pcloud/*",
+        "clouddiff/*"
       ]
     }
   ],

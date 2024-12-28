@@ -108,11 +108,11 @@ function accessTokenChanged(changes) {
 
 
 async function triggerAuth(context) {
-	const clientId = (await chrome.storage.sync.get({ appKey: APP_KEY })).appKey;
+	const { appKey } = await chrome.storage.sync.get({ appKey: APP_KEY });
 
-	let dbx = new Dropbox.Dropbox({ clientId, fetch: window.fetch }),
+	let dbx = new Dropbox.Dropbox({ clientId: appKey }),
 		receiver_path = chrome.runtime.getURL('dropbox/oauth-receiver.html'),
-		auth_url = dbx.getAuthenticationUrl(receiver_path, JSON.stringify(context));
+		auth_url = await dbx.auth.getAuthenticationUrl(receiver_path, JSON.stringify(context));
 	window.open(auth_url, 'clouddiff-dropbox-oauth');
 }
 
@@ -121,13 +121,13 @@ async function triggerAuth(context) {
 async function dbxCall(callback, context) {
 	try {
 		if (!DBX) {
-			const access_token = (await chrome.storage.sync.get('accessToken')).accessToken;
+			const { accessToken } = await chrome.storage.sync.get('accessToken');
 			// If empty, treat like access token is expired.
-			if (!access_token) { throw {status: 401} }
-			DBX = new Dropbox.Dropbox({accessToken: access_token, fetch: window.fetch});
+			if (!accessToken) { throw {status: 401} }
+			DBX = new Dropbox.Dropbox({ accessToken });
 		}
 
-		return await callback(DBX);
+		return (await callback(DBX)).result;
 	}
 	catch (err) {
 		if (err.status == 401) {
@@ -149,14 +149,12 @@ async function fetchFileText() {
 
 	if (!(rev in REV_TEXT_MAP)) {
 		// Download file.
-		REV_TEXT_MAP[rev] = await dbxCall(
-			async dbx => {
-				let file_meta = await dbx.filesDownload({ path: `rev:${rev}` });
-				return await file_meta.fileBlob.text();
-			},
+		REV_TEXT_MAP[rev] = (await dbxCall(
+			async dbx => dbx.filesDownload({ path: `rev:${rev}` }),
 			context
-		);
+		)).fileBlob.text();
 	}
+
 	return REV_TEXT_MAP[rev];
 }
 
@@ -175,7 +173,7 @@ class DiffDropbox extends CloudDiff.Diff {
 			}
 			const revisions = await dbxCall(
 				// Note - if there are more than 100 revisions, we're out of luck.
-				dbx => dbx.filesListRevisions({path: FQ_PATH, mode: {'.tag': 'path'}, limit: 100}),
+				async dbx => dbx.filesListRevisions({ path: FQ_PATH, mode: {'.tag': 'path'}, limit: 100 }),
 				context
 			);
 			TS_REV_MAP = {};
@@ -197,7 +195,7 @@ class DiffDropbox extends CloudDiff.Diff {
 
 		const rev = TS_REV_MAP[ts],
 			modified = $row.find('.file-revisions__text--time').text().trim(),
-			extra = {rev, context};
+			extra = { rev, context };
 		return new CloudDiff.FileInfo(FILENAME, modified, sjid, fetchFileText, extra);
 	}
 }

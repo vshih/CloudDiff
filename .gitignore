@@ -3,4 +3,5 @@
 *.svn
 *.zip
 /.envrc
+/node_modules
 /test/chrome-extension/

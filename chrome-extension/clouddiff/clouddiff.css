@@ -1,0 +1,64 @@
+
+#clouddiff-dialog {
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	top: 0;
+	z-index: 100;
+
+	display: none;
+}
+.clouddiff-head {
+	background-color: white;
+	box-sizing: border-box;
+	color: black;
+	font-family: Arial, Helvetica;
+	position: absolute;
+	height: 50px;
+	width: 100%;
+}
+.clouddiff-head h2 {
+	font-size: 16px;
+	font-weight: normal;
+	line-height: normal;
+	margin: 16px;
+	padding: 0;
+	position: absolute;
+}
+.clouddiff-head h2:nth-child(2) {
+	left: calc((100% + 6%) / 2);
+}
+.clouddiff-close {
+	color: black;
+	cursor: pointer !important;
+	float: right;
+	font-size: 28px;
+	font-weight: bold;
+	padding: 10px;
+	text-decoration: none;
+}
+.clouddiff-close:hover {
+	color: gray;
+}
+.clouddiff-content {
+	background-color: white;
+	overflow: auto;
+	position: absolute;
+	top: 50px;
+	height: calc(100% - 50px);
+	width: 100%;
+}
+
+/* Facilitate busy-cursor. */
+.clouddiff-progress {
+	cursor: progress !important;
+}
+
+
+/* jquery.alertable.css overrides. */
+.alertable {
+    left: calc(50% - 250px);
+    width: 500px;
+}
+
